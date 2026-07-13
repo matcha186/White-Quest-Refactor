@@ -47,11 +47,15 @@
 
 ## フェーズ3：基盤整備後に対応する残りのバグ
 
-- [ ] ⑦きりやん「丸飲み」の即死ギミック修正：`turnStartEnemy()` の `otherActor.marunomi = false;` を削除し、丸飲み実行後に明示的にリセット 🔴
-- [ ] ⑧`filterDamage()` の無敵判定から `target.name == 'シャークん'` の名前縛りを外す 🔴
-- [ ] ⑨`displayHPandSP()` のSP表示分岐修正：Nakamu専用色分けは `player.name == 'Nakamu' && isNakamuSummon != 1` に限定 🟡
-- [ ] ⑩シャークん「高級な武器を購入」に `お金 == 0` ガードを追加 🟡
-- [ ] ⑬`rollDice()` のクリックハンドラを名前付き関数化し `removeEventListener` してから登録 🟢
+- [x] ⑦きりやん「丸飲み」の即死ギミック修正：`turnStartEnemy()` の `otherActor.marunomi = false;` を削除し、丸飲み実行後に明示的にリセット 🔴
+  - [x] 「丸飲み」のダメージ自体は引き続きfilterDamage非経由(防御無視の即死技として維持。ユーザー確認が必要な論点)
+- [x] ⑧`filterDamage()` の無敵判定から `target.name == 'シャークん'` の名前縛りを外す 🔴
+- [x] ⑨`displayHPandSP()` のSP表示分岐修正：Nakamu専用色分けを `player.name == 'Nakamu'` のみに限定(isNakamuSummonでのOR条件を削除。実装調査の結果、召喚中はplayer.nameが召喚キャラ名に一時変更されるため、この条件だけで正しく分岐できると判明) 🟡
+  - [x] 置き換え中に新規バグ⑱を発見・修正(友情コンボ終了後、Nakamu自身のレベル表示が召喚キャラの最終ステータス値のまま残ってしまう問題。詳細はBUGS.md参照)
+  - [x] 副産物：表示に使われなくなった `isNakamuSummon` 変数を削除(死んだ状態変数の除去)
+- [x] ⑩シャークん「高級な武器を購入」に `お金 == 0` ガードを追加 🟡
+- [x] ⑬`rollDice()` のクリックハンドラを名前付き関数化し `removeEventListener` してから登録 🟢
+  - [x] ハンドラをモジュールスコープに固定し、状態を `diceRollState` にまとめて、呼び出しをまたいでも確実に removeEventListener が効くように修正(単に名前付き関数にするだけでは、関数を毎回関数内で再生成すると同一参照にならず removeEventListener が効かないため)
 
 ## フェーズ4：スタイルクリーンアップ
 

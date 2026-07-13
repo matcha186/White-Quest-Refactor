@@ -88,7 +88,6 @@ let isTurnEnd = false;
 
 let nakamuLevel = 1;
 let isNakamuChoice = false;
-let isNakamuSummon = 0;
 let nakamuCoins = 3;
 let nakamuMP = 3;
 let currentGuest = '';
@@ -623,7 +622,10 @@ async function turnStartEnemy() {
     }
 
     otherActor.invincible = false;
-    otherActor.marunomi = false;
+    // marunomi(きりやんの「丸飲み」待機フラグ)はここではリセットしない。
+    // 「自分の次の自分のターンまで保持」する必要があるため、ここで毎ターンリセットすると
+    // 相手の手番を挟んだ時点で常にfalseに戻ってしまい、即死ギミックが発動不可能になる(バグ⑦)。
+    // 実際に丸飲みを実行した時点(kiriyanAction case6)でリセットする。
     toggleCloudEffect(currentActor);
 
     console.log(turnCount + 'ターン目終了');
@@ -869,73 +871,88 @@ function randomDecide() {
     }
 }
 
+// rollDice()は毎ターン呼ばれるが、クリックハンドラを毎回 addEventListener すると
+// removeEventListener と対にできず登録され続けてしまう(同一クリックで処理が多重実行される)。
+// ハンドラをモジュールスコープの固定参照にし、状態は diceRollState にまとめることで
+// 呼び出しのたびに removeEventListener → addEventListener で確実に1つだけに保つ。
+let diceRollState = {
+    isDice: false,
+    isRollStarted: false,
+    diceInterval: null,
+    previousDiceNumber: null,
+    diceResult: null
+};
+
+function rollDiceLogic(diceNum, setImageSrc) {
+    if (diceNum === 0) {
+        // Random roll
+        let diceNumber;
+        do {
+            diceNumber = Math.floor(Math.random() * 6) + 1;
+        } while (diceNumber === diceRollState.previousDiceNumber);
+        setImageSrc(`img/dice/dice${diceNumber}.png`);
+        return diceNumber;
+    } else {
+        // Set to specified number
+        setImageSrc(`img/dice/dice${diceNum}.png`);
+        return diceNum;
+    }
+}
+
+function onPlayerDiceClick() {
+    if (diceRollState.isRollStarted) {
+        clearInterval(diceRollState.diceInterval);
+        diceRollState.isRollStarted = false;
+        diceRollState.diceResult = diceRollState.previousDiceNumber;
+        playerDice.src = `img/dice/dice${diceRollState.diceResult}.png`;
+        diceRollState.isDice = true;
+    } else {
+        diceRollState.diceInterval = setInterval(() => {
+            diceRollState.previousDiceNumber = rollDiceLogic(playerDiceNum, src => playerDice.src = src);
+        }, 100);
+        diceRollState.isRollStarted = true;
+        playerDiceButton.innerText = "止める";
+    }
+}
+
+function onEnemyDiceClick() {
+    if (diceRollState.isRollStarted) {
+        clearInterval(diceRollState.diceInterval);
+        diceRollState.isRollStarted = false;
+        diceRollState.diceResult = diceRollState.previousDiceNumber;
+        enemyDice.src = `img/dice/dice${diceRollState.diceResult}.png`;
+        diceRollState.isDice = true;
+    } else {
+        diceRollState.diceInterval = setInterval(() => {
+            diceRollState.previousDiceNumber = rollDiceLogic(enemyDiceNum, src => enemyDice.src = src);
+        }, 100);
+        diceRollState.isRollStarted = true;
+        enemyDiceButton.innerText = "止める";
+    }
+}
+
 async function rollDice() {
-    var isDice = false;
-    var isRollStarted = false;
-    var diceInterval;
-    var previousDiceNumber = null;
-    var diceResult;
-
-    var playerDiceImage = document.getElementById('player-dice');
-    var enemyDiceImage = document.getElementById('enemy-dice');
-
-    const rollDiceLogic = (diceNum, setImageSrc) => {
-        if (diceNum === 0) {
-            // Random roll
-            let diceNumber;
-            do {
-                diceNumber = Math.floor(Math.random() * 6) + 1;
-            } while (diceNumber === previousDiceNumber);
-            setImageSrc(`img/dice/dice${diceNumber}.png`);
-            return diceNumber;
-        } else {
-            // Set to specified number
-            setImageSrc(`img/dice/dice${diceNum}.png`);
-            return diceNum;
-        }
+    diceRollState = {
+        isDice: false,
+        isRollStarted: false,
+        diceInterval: null,
+        previousDiceNumber: null,
+        diceResult: null
     };
 
     if (currentPlayer == 'player') {
-        playerDiceButton.addEventListener('click', () => {
-            if (isRollStarted) {
-                clearInterval(diceInterval);
-                isRollStarted = false;
-                diceResult = previousDiceNumber;
-                playerDiceImage.src = `img/dice/dice${diceResult}.png`;
-                isDice = true;
-            } else {
-                diceInterval = setInterval(() => {
-                    previousDiceNumber = rollDiceLogic(playerDiceNum, src => playerDiceImage.src = src);
-                }, 100);
-                isRollStarted = true;
-                playerDiceButton.innerText = "止める";
-            }
-        });
+        playerDiceButton.removeEventListener('click', onPlayerDiceClick);
+        playerDiceButton.addEventListener('click', onPlayerDiceClick);
     } else if (currentPlayer == 'enemy') {
-        enemyDiceButton.addEventListener('click', () => {
-            if (isRollStarted) {
-                clearInterval(diceInterval);
-                isRollStarted = false;
-                diceResult = previousDiceNumber;
-                enemyDiceImage.src = `img/dice/dice${diceResult}.png`;
-                isDice = true;
-            } else {
-                diceInterval = setInterval(() => {
-                    previousDiceNumber = rollDiceLogic(enemyDiceNum, src => enemyDiceImage.src = src);
-                }, 100);
-                isRollStarted = true;
-                enemyDiceButton.innerText = "止める";
-            }
-        });
+        enemyDiceButton.removeEventListener('click', onEnemyDiceClick);
+        enemyDiceButton.addEventListener('click', onEnemyDiceClick);
     }
 
-    while (!isDice) {
+    while (!diceRollState.isDice) {
         await sleep(1);
     }
 
-    isDice = false;
-
-    return diceResult;
+    return diceRollState.diceResult;
 }
 
 function buttonAble(num) {
@@ -1066,7 +1083,6 @@ async function nakamuAction(dice, actor, target) {
             }
             break;
         case 5: // 仲間と共に友情コンボ
-            isNakamuSummon = actor.playerNum;
             await log('Nakamuの仲間と共に友情コンボ！');
             await log('キャラクターを選択してください。', true);
             switch (target.name) {
@@ -1104,7 +1120,6 @@ async function nakamuAction(dice, actor, target) {
                     break;
             }
             displayHPandSP();
-            isNakamuSummon = 0;
             break;
         case 6: // レベルアップ！
             nakamuLevel++;
@@ -1248,11 +1263,12 @@ async function sharkenAction(dice, actor, target, isNakamu) {
             break;
         case 5: // 高級な武器を購入
             await log(actor.name + 'は高級な武器を購入し、/それを使って攻撃した！');
-            await log('お金×10ダメージ！');
-            if (isNakamu) {
-                await applyDamage(nakamuCoins * 10, target);
+            const coins = isNakamu ? nakamuCoins : actor.spValue;
+            if (coins == 0) {
+                await log('しかし、お金が無く/武器を購入できなかった！');
             } else {
-                await applyDamage(actor.spValue * 10, target);
+                await log('お金×10ダメージ！');
+                await applyDamage(coins * 10, target);
             }
             break;
         case 6: // イカサマ
@@ -1476,6 +1492,7 @@ async function kiriyanAction(dice, actor, target) {
                 target.hp -= currentDamage6;
                 displayHPandSP();
                 await log(target.name + 'のHPが0になった。');
+                actor.marunomi = false;
             }
             break;
     } 
@@ -1486,7 +1503,7 @@ function displayHPandSP() {
     enemyHPText.innerHTML = 'HP: ' + enemy.hp;
     playerTurnText.innerHTML = player.turn;
     enemyTurnText.innerHTML = enemy.turn;
-    if (player.name == 'Nakamu' || isNakamuSummon == 1) {
+    if (player.name == 'Nakamu') {
         if (player.spValue == 1) {
             playerSPText.innerHTML = player.spName + '<span style="color: white;">' + player.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
         } else if (player.spValue == 2) {
@@ -1508,7 +1525,7 @@ function displayHPandSP() {
         }
     }
 
-    if (enemy.name == 'Nakamu' || isNakamuSummon == 2) {
+    if (enemy.name == 'Nakamu') {
         if (enemy.spValue == 1) {
             enemySPText.innerHTML = enemy.spName + '<span style="color: white;">' + enemy.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
         } else if (enemy.spValue == 2) {
@@ -1532,8 +1549,8 @@ function displayHPandSP() {
 }
 
 async function filterDamage(damage, target) {
-    if (target.invincible && target.name == 'シャークん') {
-        await log('シャークんは隠れているため、/攻撃を与えられなかった！');
+    if (target.invincible) {
+        await log(target.name + 'は隠れているため、/攻撃を与えられなかった！');
         target.invincible = false;
         return 0;
     } else {
@@ -1669,6 +1686,9 @@ async function nakamu5Action(guest, actor, target) {
     enemySummonIcon.style.display = 'none';
     enemySummonDetail.style.display = 'none';
     actor.name = 'Nakamu';
+    // 召喚キャラの技(防御態勢・お金稼ぎ等)がactor.spValueを書き換えている場合があるため、
+    // Nakamu自身のレベル値に復元する(復元しないとレベル表示が召喚キャラの値のまま残ってしまう)
+    actor.spValue = nakamuLevel;
 }
 
 // 新しい試合を始める前に、キャラクター固有のアビリティフラグと player/enemy の戦闘状態をまとめてリセットする
@@ -1676,7 +1696,6 @@ async function nakamu5Action(guest, actor, target) {
 function resetBattleState() {
     nakamuLevel = 1;
     isNakamuChoice = false;
-    isNakamuSummon = 0;
     nakamuCoins = 3;
     nakamuMP = 3;
     currentGuest = '';

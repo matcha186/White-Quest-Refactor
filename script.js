@@ -243,7 +243,7 @@ let isChoice = false;
 
 function updateCardDisplay(id) {
     if (imageMap[id]) {
-        if (id == 'random-button') {
+        if (id === 'random-button') {
             charaCard.style.imageRendering = 'pixelated';
         } else {
             charaCard.style.imageRendering = '';
@@ -283,12 +283,12 @@ for (let i = 0; i < charaChoice.length; i++) { // キャラ選択画面のボタ
             randomButton.disabled = false;
 
             for (let j = 0; j < charaChoice.length; j++) {
-                if (currentChoicePlayer == 1) { // 1人目選ぶ
+                if (currentChoicePlayer === 1) { // 1人目選ぶ
                     charaChoice[j].classList.remove('disabled');
                     charaChoice[j].disabled = false;
 
                 } else { // 2人目選ぶ
-                    if (playerCharaNum == j + 1) {
+                    if (playerCharaNum === j + 1) {
                         continue;
                     } else {
                         charaChoice[j].classList.remove('disabled');
@@ -355,7 +355,7 @@ randomButton.addEventListener('mouseenter', function() {
 });
 
 randomButton.addEventListener('mouseleave', function() {
-    if (currentChoice == '') {
+    if (currentChoice === '') {
         charaCard.style.display = 'none';
     }
 });
@@ -365,7 +365,7 @@ async function game() {
     turnCountText.innerHTML = '1ターン目';
     buttonAble(0);
     document.getElementById('choice-display').style.display = 'none';
-    if (playMode == 1) {
+    if (playMode === 1) {
         await enemyBattle(); // 2人対戦
     } else {
         await npcBattle(); // NPC対戦
@@ -385,7 +385,7 @@ async function choice() {
     cancelLog = false;
 
     let enemyLogPromise;
-    if (playMode == 1) {
+    if (playMode === 1) {
         enemyLogPromise = await log(choiceLog.enemy, true);
     } else {
         enemyLogPromise = await log(choiceLog.cpu, true);
@@ -455,7 +455,7 @@ async function decideName() {
 async function npcBattle() {
     await log(enemy.job + enemy.name + battleLog.startNPC);
 
-    if (player.turn == '先攻') {
+    if (player.turn === '先攻') {
         await log(battleLog.playerFirst + '/' + battleLog.dicePlayer, true);
     } else {
         await log(battleLog.cpuFirst + '/' + enemy.name + battleLog.diceEnemy, true);
@@ -504,7 +504,7 @@ async function turnStartEnemy() {
     if (turnCount === 1) {
         currentActor = (player.turn === '先攻') ? player : enemy;
         otherActor = (player.turn === '先攻') ? enemy : player;
-        if (kintokiMoreTurn != true) {
+        if (kintokiMoreTurn !== true) {
             logMessage = (currentActor === player) ? battleLog.leftPlayerFirst : battleLog.rightPlayerFirst;
         }
     } else {
@@ -519,14 +519,14 @@ async function turnStartEnemy() {
     }
 
     if (isSmile2) {
-        if (currentActor.name == 'きりやん') {
-            if (currentActor.turnSkip == true) {
+        if (currentActor.name === 'きりやん') {
+            if (currentActor.turnSkip === true) {
                 await log('きりやんは凍結されており、/さらに眼鏡を落として慌てている！');
             } else {
                 await log(currentActor.name + 'は凍結されている！/このターンは行動できない。');
             }
-        } else if (currentActor.name == 'Broooock') {
-            if (currentActor.turnSkip == true) {
+        } else if (currentActor.name === 'Broooock') {
+            if (currentActor.turnSkip === true) {
                 await log('Broooockは宿屋で爆睡し、/さらに凍結されている！');
             } else {
                 await log(currentActor.name + 'は凍結されている！/このターンは行動できない。');
@@ -536,7 +536,7 @@ async function turnStartEnemy() {
         }
         otherActor.shieldDamage = 0;
         console.log(turnCount + 'ターン目終了');
-        if (kintokiMoreTurn != true) {
+        if (kintokiMoreTurn !== true) {
             turnCount++;
         }
         isSmile2 = false;
@@ -547,7 +547,7 @@ async function turnStartEnemy() {
     if (!currentActor.turnSkip) {
         currentPlayer = currentActor === player ? 'player' : 'enemy';
         buttonAble(currentPlayer === 'player' ? 1 : 2);
-        if (kintokiMoreTurn == true) {
+        if (kintokiMoreTurn === true) {
             await log(battleLog.kintokiMoreTurnLog + '/' + battleLog.dicePlayer, true);
             kintokiMoreTurn = false;
         } else {
@@ -558,7 +558,7 @@ async function turnStartEnemy() {
         } else {
             enemyDiceButton.style.pointerEvents = 'auto';
         }
-        if (isSmile6 && currentActor.name != 'スマイル') { // スマイル振り直し
+        if (isSmile6 && currentActor.name !== 'スマイル') { // スマイル振り直し
             currentDiceNum = await rollDice();
             await log('【スマイル】ダイスを振り直させますか？', true);
             const shouldReroll = await promptReroll();
@@ -574,7 +574,7 @@ async function turnStartEnemy() {
             isSmile6 = false;
             isSharken6 = false;
         } else {
-            if (isSharken6 && currentActor.name == 'シャークん') { // シャークん振り直し
+            if (isSharken6 && currentActor.name === 'シャークん') { // シャークん振り直し
                 currentDiceNum = await rollDice();
                 await log('【シャークん】ダイスを振り直しますか？', true);
                 const shouldReroll = await promptReroll();
@@ -605,7 +605,7 @@ async function turnStartEnemy() {
     }
 
     if (isKiriyan2) { // きりやん火傷
-        if (currentActor.name != 'きりやん') {
+        if (currentActor.name !== 'きりやん') {
             await log(currentActor.name + 'は火傷による/継続ダメージを受けた！');
             await applyDamage(10, currentActor);
         }
@@ -617,7 +617,7 @@ async function turnStartEnemy() {
         await sleep(1);
     }
 
-    if (otherActor.name == 'Broooock') {
+    if (otherActor.name === 'Broooock') {
         otherActor.spValue = 0;
     }
 
@@ -629,7 +629,7 @@ async function turnStartEnemy() {
     toggleCloudEffect(currentActor);
 
     console.log(turnCount + 'ターン目終了');
-    if (kintokiMoreTurn != true) {
+    if (kintokiMoreTurn !== true) {
         turnCount++;
     }
 }
@@ -640,7 +640,7 @@ async function skipBroKiri(actor) {
         'きりやん': '眼鏡を探しながら慌てている！',
         'Nakamu': '宿屋でぐっすり寝ている！'
     };
-    if (actor.playerNum == 1) {
+    if (actor.playerNum === 1) {
         await log(battleLog.leftTurn + `/${actor.name}は${messages[actor.name]}`);
     } else {
         await log(battleLog.rightTurn + `/${actor.name}は${messages[actor.name]}`);
@@ -674,7 +674,7 @@ async function setChara() {
     applyCharacterData(player);
     applyCharacterData(enemy);
 
-    if (firstPlayer == '') {
+    if (firstPlayer === '') {
         let turnNum = Math.floor(Math.random() * 2) + 1;
 
         if (turnNum === 1) {
@@ -686,11 +686,11 @@ async function setChara() {
             player.turn = '後攻';
             enemy.turn = '先攻';
         }
-    } else if (firstPlayer == 'player') {
+    } else if (firstPlayer === 'player') {
         firstPlayer = 'player';
         player.turn = '先攻';
         enemy.turn = '後攻';
-    } else if (firstPlayer == 'enemy') {
+    } else if (firstPlayer === 'enemy') {
         firstPlayer = 'enemy';
         player.turn = '後攻';
         enemy.turn = '先攻';
@@ -699,7 +699,7 @@ async function setChara() {
     playerJobText.innerHTML = player.job;
     playerNameText.innerHTML = player.name;
     playerHPText.innerHTML = 'HP: ' + player.hp;
-    if (player.name == 'Nakamu') {
+    if (player.name === 'Nakamu') {
         playerSPText.innerHTML = player.spName + player.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')';
     } else {
         playerSPText.innerHTML = player.spName + player.spValue;
@@ -707,7 +707,7 @@ async function setChara() {
     enemyJobText.innerHTML = enemy.job;
     enemyNameText.innerHTML = enemy.name;
     enemyHPText.innerHTML = 'HP: ' + enemy.hp;
-    if (enemy.name == 'Nakamu') {
+    if (enemy.name === 'Nakamu') {
         enemySPText.innerHTML = enemy.spName + enemy.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')';
     } else {
         enemySPText.innerHTML = enemy.spName + enemy.spValue;
@@ -789,17 +789,17 @@ function healEffect(actor) {
 function decideTurn() {
     const turnDecideButton = document.getElementById('turn-decide-button');
 
-    if (firstPlayer == '') {
+    if (firstPlayer === '') {
         turnDecideButton.innerHTML = '1P';
         firstPlayer = 'player';
-    } else if (firstPlayer == 'player') {
-        if (playMode == 1) {
+    } else if (firstPlayer === 'player') {
+        if (playMode === 1) {
             turnDecideButton.innerHTML = '2P';
         } else {
             turnDecideButton.innerHTML = 'CPU';
         }
         firstPlayer = 'enemy';
-    } else if (firstPlayer == 'enemy') {
+    } else if (firstPlayer === 'enemy') {
         turnDecideButton.innerHTML = '?';
         firstPlayer = '';
     }
@@ -819,13 +819,13 @@ function randomButtonEnter() {
     
     buttons.forEach(button => {
         for (let j = 0; j < charaChoice.length; j++) {
-            if (currentChoicePlayer == 1) { // 1人目選ぶ
+            if (currentChoicePlayer === 1) { // 1人目選ぶ
                 randomButton.classList.add('disabled');
                 randomButton.disabled = true;
                 charaChoice[j].classList.remove('disabled');
                 charaChoice[j].disabled = false;
             } else { // 2人目選ぶ
-                if (playerCharaNum == j + 1) {
+                if (playerCharaNum === j + 1) {
                     continue;
                 } else {
                     randomButton.classList.add('disabled');
@@ -843,7 +843,7 @@ function randomDecide() {
 
     const numbers = Object.keys(charaNumArray).map(Number);
 
-    if (player.name == 'ランダム' && enemy.name == 'ランダム') {
+    if (player.name === 'ランダム' && enemy.name === 'ランダム') {
         const randomIndex1 = Math.floor(Math.random() * numbers.length);
         let randomIndex2 = Math.floor(Math.random() * numbers.length);
 
@@ -856,13 +856,13 @@ function randomDecide() {
 
         player.name = randomElement1;
         enemy.name = randomElement2;
-    } else if (player.name == 'ランダム' && enemy.name != 'ランダム') {
+    } else if (player.name === 'ランダム' && enemy.name !== 'ランダム') {
 
         let filteredNumbers = numbers.filter(number => charaNumArray[number] !== enemy.name);
         const randomIndex = Math.floor(Math.random() * filteredNumbers.length);
         player.name = charaNumArray[filteredNumbers[randomIndex]];
 
-    } else if (player.name != 'ランダム' && enemy.name == 'ランダム') {
+    } else if (player.name !== 'ランダム' && enemy.name === 'ランダム') {
 
         let filteredNumbers = numbers.filter(number => charaNumArray[number] !== player.name);
         const randomIndex = Math.floor(Math.random() * filteredNumbers.length);
@@ -940,10 +940,10 @@ async function rollDice() {
         diceResult: null
     };
 
-    if (currentPlayer == 'player') {
+    if (currentPlayer === 'player') {
         playerDiceButton.removeEventListener('click', onPlayerDiceClick);
         playerDiceButton.addEventListener('click', onPlayerDiceClick);
-    } else if (currentPlayer == 'enemy') {
+    } else if (currentPlayer === 'enemy') {
         enemyDiceButton.removeEventListener('click', onEnemyDiceClick);
         enemyDiceButton.addEventListener('click', onEnemyDiceClick);
     }
@@ -956,10 +956,10 @@ async function rollDice() {
 }
 
 function buttonAble(num) {
-    if (num == 0) {
+    if (num === 0) {
         playerDiceButton.style.display = 'none';
         enemyDiceButton.style.display = 'none';
-    } else if (num == 1) {
+    } else if (num === 1) {
         playerDiceButton.style.display = 'block';
         enemyDiceButton.style.display = 'none';
     } else {
@@ -980,12 +980,12 @@ async function charaAction(dice, actor, target) {
     await log("ダイスの出目: " + dice);
 
     if (isKintoki6) {
-        if (dice == 1) {
+        if (dice === 1) {
             await log('1が出たため、きんときの挑発は/意味を成さなかった...');
             isKintoki6 = false;
         } else {
             fadeOutDice(actor).then(() => {
-                if (actor.playerNum == 1) {
+                if (actor.playerNum === 1) {
                     playerDice.src = 'img/dice/dice1.png';
                 } else {
                     enemyDice.src = 'img/dice/dice1.png';
@@ -1045,9 +1045,9 @@ async function nakamuAction(dice, actor, target) {
             break;
         case 2: // 光の魔法を発動
             await log(actor.name + 'が光の魔法を発動！' + '/' + 'サイコロの目×10ダメージ！', true);
-            if (actor == player) {
+            if (actor === player) {
                 buttonAble(1);
-            } else if (actor == enemy) {
+            } else if (actor === enemy) {
                 buttonAble(2);
             }
             playerDiceButton.innerText = "回す";
@@ -1064,7 +1064,7 @@ async function nakamuAction(dice, actor, target) {
         case 3: // 盾で防ぎながらの攻撃
             await log(actor.name + 'の盾で防ぎながらの攻撃！');
             let currentDamage3_1 = await applyDamage(20 + addDamage, target, (d) => target.name + 'に' + d + 'ダメージ！/次の相手ターンに受けるダメージを-20した。');
-            if (currentDamage3_1 == 0) {
+            if (currentDamage3_1 === 0) {
                 // シールドで完全に軽減された場合も、盾で防御しながらの攻撃なので防御バフ自体は発生する
                 await log(actor.name + 'は次の相手ターンに受ける/ダメージを-20した。');
             }
@@ -1072,7 +1072,7 @@ async function nakamuAction(dice, actor, target) {
             break;
         case 4: // 回復魔法で傷を癒す
             await log(actor.name + 'が回復魔法を発動！');
-            if (actor.hp == CHARACTERS['Nakamu'].maxHp) {
+            if (actor.hp === CHARACTERS['Nakamu'].maxHp) {
                 await log('しかし、これ以上回復できない！');
             } else {
                 let beforeHP = actor.hp;
@@ -1141,9 +1141,9 @@ async function broooockAction(dice, actor, target, isNakamu) {
             break;
         case 3: // 巨神斬りの構え
             await log(actor.name + 'の巨神斬りの構え！/サイコロを振り奇数が出れば80ダメージ！', true);
-            if (actor == player) {
+            if (actor === player) {
                 buttonAble(1);
-            } else if (actor == enemy) {
+            } else if (actor === enemy) {
                 buttonAble(2);
             }
             playerDiceButton.style.pointerEvents = 'auto';
@@ -1153,7 +1153,7 @@ async function broooockAction(dice, actor, target, isNakamu) {
             playerDiceButton.style.pointerEvents = 'none';
             enemyDiceButton.style.pointerEvents = 'none';
             await log("ダイスの出目: " + currentNum);
-            if (currentNum % 2 == 0) {
+            if (currentNum % 2 === 0) {
                 await log('偶数だったため、何も起こらなかった。');
             } else {
                 await applyDamage(80, target);
@@ -1175,7 +1175,7 @@ async function broooockAction(dice, actor, target, isNakamu) {
         case 6: // 宿屋で睡眠
             if (isNakamu) {
                 await log('Nakamuは宿屋で寝た。');
-                if (actor.hp == CHARACTERS['Nakamu'].maxHp) {
+                if (actor.hp === CHARACTERS['Nakamu'].maxHp) {
                     await log('しかし、これ以上回復できない！/次のターン行動できなくなった。');
                 } else {
                     let beforeHP = actor.hp;
@@ -1186,7 +1186,7 @@ async function broooockAction(dice, actor, target, isNakamu) {
                 }
             } else {
                 await log(actor.name + 'は宿屋で寝た。');
-                if (actor.hp == CHARACTERS[actor.name].maxHp) {
+                if (actor.hp === CHARACTERS[actor.name].maxHp) {
                     await log('しかし、これ以上回復できない！');
                 } else {
                     let beforeHP = actor.hp;
@@ -1213,9 +1213,9 @@ async function sharkenAction(dice, actor, target, isNakamu) {
             await log('サイコロを振り偶数が出れば40ダメージ！/ダイスを回してください。', true);
             playerDiceButton.innerText = "回す";
             enemyDiceButton.innerText = "回す";
-            if (actor == player) {
+            if (actor === player) {
                 buttonAble(1);
-            } else if (actor == enemy) {
+            } else if (actor === enemy) {
                 buttonAble(2);
             }
             playerDiceButton.style.pointerEvents = 'auto';
@@ -1225,7 +1225,7 @@ async function sharkenAction(dice, actor, target, isNakamu) {
             playerDiceButton.style.pointerEvents = 'none';
             enemyDiceButton.style.pointerEvents = 'none';
             await log("ダイスの出目: " + currentNum);
-            if (currentNum % 2 == 1) {
+            if (currentNum % 2 === 1) {
                 await log('奇数だったため、何も起こらなかった。');
             } else {
                 await applyDamage(40, target);
@@ -1239,7 +1239,7 @@ async function sharkenAction(dice, actor, target, isNakamu) {
                 nakamuCoins += 3;
             } else {
                 const currentDamage3 = await applyDamage(30, target, (d) => target.name + 'に' + d + 'ダメージ！/お金が3増えた。');
-                if (currentDamage3 == 0) {
+                if (currentDamage3 === 0) {
                     await log(actor.name + 'のお金が3増えた。');
                 }
                 actor.spValue += 3;
@@ -1248,7 +1248,7 @@ async function sharkenAction(dice, actor, target, isNakamu) {
         case 4: // 雲隠れ
             await log(actor.name + 'の雲隠れ！');
             let sharkenMaxHp = isNakamu ? CHARACTERS['Nakamu'].maxHp : CHARACTERS[actor.name].maxHp;
-            if (actor.hp == sharkenMaxHp) {
+            if (actor.hp === sharkenMaxHp) {
                 await log('しかし、これ以上回復できない！');
             } else {
                 let beforeHP = actor.hp;
@@ -1264,7 +1264,7 @@ async function sharkenAction(dice, actor, target, isNakamu) {
         case 5: // 高級な武器を購入
             await log(actor.name + 'は高級な武器を購入し、/それを使って攻撃した！');
             const coins = isNakamu ? nakamuCoins : actor.spValue;
-            if (coins == 0) {
+            if (coins === 0) {
                 await log('しかし、お金が無く/武器を購入できなかった！');
             } else {
                 await log('お金×10ダメージ！');
@@ -1297,13 +1297,13 @@ async function kintokiAction(dice, actor, target, isNakamu) {
             await log(actor.name + 'のカウンター！');
             await log('最後に相手から受けた攻撃の/2倍のダメージを与える！');
             if (isNakamu) {
-                if (nakamuBeforeDamage == 0) {
+                if (nakamuBeforeDamage === 0) {
                     await log('しかし、Nakamuは/攻撃を与えられていなかった！');
                 } else {
                     await applyDamage(nakamuBeforeDamage * 2, target);
                 }
             } else {
-                if (actor.spValue == 0) {
+                if (actor.spValue === 0) {
                     await log('しかし、きんときは/攻撃を与えられていなかった！');
                 } else {
                     await applyDamage(actor.spValue * 2, target);
@@ -1315,7 +1315,7 @@ async function kintokiAction(dice, actor, target, isNakamu) {
             if (actor.hp < target.hp) {
                 await applyDamage(target.hp - actor.hp, target);
             } else {
-                if (actor.hp == target.hp) {
+                if (actor.hp === target.hp) {
                     await log('HPが同じだったため、/何も起こらなかった。');
                 } else {
                     await log('HPが相手より高いため、/何も起こらなかった。');
@@ -1351,9 +1351,9 @@ async function smileAction(dice, actor, target, isNakamu) {
             playerDiceButton.innerText = "回す";
             enemyDiceButton.innerText = "回す";
             await log('ダイスを回してください。', true);
-            if (actor == player) {
+            if (actor === player) {
                 buttonAble(1);
-            } else if (actor == enemy) {
+            } else if (actor === enemy) {
                 buttonAble(2);
             }
             playerDiceButton.style.pointerEvents = 'auto';
@@ -1374,7 +1374,7 @@ async function smileAction(dice, actor, target, isNakamu) {
             await log(actor.name + 'はドレイン魔法を放った！');
             await applyDamage(30, target);
             let smileMaxHp = isNakamu ? CHARACTERS['Nakamu'].maxHp : CHARACTERS[actor.name].maxHp;
-            if (actor.hp == smileMaxHp) {
+            if (actor.hp === smileMaxHp) {
                 await log('スマイルはこれ以上回復できない！');
             } else {
                 let beforeHP = actor.hp;
@@ -1396,19 +1396,19 @@ async function smileAction(dice, actor, target, isNakamu) {
             break;
         case 5: // 魔力の奔流
             await log(actor.name + 'は自身の魔力を集め始めた！');
-            if (actor.spValue == 0) {
+            if (actor.spValue === 0) {
                 await log('しかし、スマイルの魔力は空っぽだった！');
             } else {
                 await log('魔力×20のダメージ！');
                 if (isNakamu) {
                     const currentDamage5 = await applyDamage(nakamuMP * 20, target);
-                    if (currentDamage5 != 0) {
+                    if (currentDamage5 !== 0) {
                         await log('スマイルの魔力が0になった。');
                     }
                     nakamuMP = 0;
                 } else {
                     const currentDamage5 = await applyDamage(actor.spValue * 20, target);
-                    if (currentDamage5 != 0) {
+                    if (currentDamage5 !== 0) {
                         await log('スマイルの魔力が0になった。');
                     }
                     actor.spValue = 0;
@@ -1443,7 +1443,7 @@ async function kiriyanAction(dice, actor, target) {
         case 3: // 魔王の眼光
             await log(actor.name + 'の魔王の眼光！');
             await applyDamage(10, target);
-            if (actor.turn == '後攻') {
+            if (actor.turn === '後攻') {
                 actor.turn = '先攻';
                 target.turn = '後攻';
                 await log(actor.name + 'のターンが先攻になった！');
@@ -1455,9 +1455,9 @@ async function kiriyanAction(dice, actor, target) {
             await log(actor.name + 'は眼鏡を落としてしまった！');
             await log('サイコロを振り3以下なら/次のターン行動できない！');
             await log('ダイスを回してください。', true);
-            if (actor == player) {
+            if (actor === player) {
                 buttonAble(1);
-            } else if (actor == enemy) {
+            } else if (actor === enemy) {
                 buttonAble(2);
             }
             playerDiceButton.style.pointerEvents = 'auto';
@@ -1481,7 +1481,7 @@ async function kiriyanAction(dice, actor, target) {
             isKiriyan5 = true;
             break;
         case 6: // 丸飲み
-            if (actor.marunomi == false) {
+            if (actor.marunomi === false) {
                 await log(actor.name + 'は大きく口を開けた！');
                 await log('次の自分のターンに6が出たら/相手のHPを0にする！');
                 actor.marunomi = true;
@@ -1503,19 +1503,19 @@ function displayHPandSP() {
     enemyHPText.innerHTML = 'HP: ' + enemy.hp;
     playerTurnText.innerHTML = player.turn;
     enemyTurnText.innerHTML = enemy.turn;
-    if (player.name == 'Nakamu') {
-        if (player.spValue == 1) {
+    if (player.name === 'Nakamu') {
+        if (player.spValue === 1) {
             playerSPText.innerHTML = player.spName + '<span style="color: white;">' + player.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
-        } else if (player.spValue == 2) {
+        } else if (player.spValue === 2) {
             playerSPText.innerHTML = player.spName + '<span style="color: yellow;">' + player.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
-        } else if (player.spValue == 3) {
+        } else if (player.spValue === 3) {
             playerSPText.innerHTML = player.spName + '<span style="color: orange;">' + player.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
         } else if (player.spValue >= 4) {
             playerSPText.innerHTML = player.spName + '<span style="color: red;">' + player.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
         }
     } else {
-        if (player.name == 'きんとき') {
-            if (player.spValue != 0) {
+        if (player.name === 'きんとき') {
+            if (player.spValue !== 0) {
                 playerSPText.innerHTML = player.spName + '<span style="color: red;">' + player.spValue + '</span>';
             } else {
                 playerSPText.innerHTML = player.spName + player.spValue;
@@ -1525,19 +1525,19 @@ function displayHPandSP() {
         }
     }
 
-    if (enemy.name == 'Nakamu') {
-        if (enemy.spValue == 1) {
+    if (enemy.name === 'Nakamu') {
+        if (enemy.spValue === 1) {
             enemySPText.innerHTML = enemy.spName + '<span style="color: white;">' + enemy.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
-        } else if (enemy.spValue == 2) {
+        } else if (enemy.spValue === 2) {
             enemySPText.innerHTML = enemy.spName + '<span style="color: yellow;">' + enemy.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
-        } else if (enemy.spValue == 3) {
+        } else if (enemy.spValue === 3) {
             enemySPText.innerHTML = enemy.spName + '<span style="color: orange;">' + enemy.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
         } else if (enemy.spValue >= 4) {
             enemySPText.innerHTML = enemy.spName + '<span style="color: red;">' + enemy.spValue + '(+' + ((nakamuLevel - 1) * 10) + ')' + '</span>';
         }
     } else {
-        if (enemy.name == 'きんとき') {
-            if (enemy.spValue != 0) {
+        if (enemy.name === 'きんとき') {
+            if (enemy.spValue !== 0) {
                 enemySPText.innerHTML = enemy.spName + '<span style="color: red;">' + enemy.spValue + '</span>';
             } else {
                 enemySPText.innerHTML = enemy.spName + enemy.spValue;
@@ -1554,20 +1554,20 @@ async function filterDamage(damage, target) {
         target.invincible = false;
         return 0;
     } else {
-        if (target.shieldDamage == 0) {
+        if (target.shieldDamage === 0) {
             return damage;
         } else {
             if (damage <= target.shieldDamage) {
                 damage = 0;
                 await log(target.name + 'は' + target.shieldDamage + 'ダメージ軽減したため、/ノーダメージだった。');
-                if (target.name == 'Broooock') {
+                if (target.name === 'Broooock') {
                     target.spValue = 0;
                 }
                 return damage;
             } else {
                 damage -= target.shieldDamage;
                 await log(target.name + 'は' + target.shieldDamage + 'ダメージ軽減した。');
-                if (target.name == 'Broooock') {
+                if (target.name === 'Broooock') {
                     target.spValue = 0;
                 }
                 return damage;
@@ -1577,9 +1577,9 @@ async function filterDamage(damage, target) {
 }
 
 async function kintokiDamage(damage, target) {
-    if (target.name == 'きんとき') {
+    if (target.name === 'きんとき') {
         target.spValue = damage;
-    } else if (target.name == 'Nakamu') {
+    } else if (target.name === 'Nakamu') {
         nakamuBeforeDamage = damage;
     }
 }
@@ -1591,7 +1591,7 @@ async function kintokiDamage(damage, target) {
 // 戻り値: 実際に与えたダメージ(シールド等で無効化された場合は0)
 async function applyDamage(rawDamage, target, messageFn) {
     const damage = await filterDamage(rawDamage, target);
-    if (damage != 0) {
+    if (damage !== 0) {
         await damageEffect(target);
         target.hp = Math.max(0, target.hp - damage);
         displayHPandSP();
@@ -1617,7 +1617,7 @@ async function nakamu5Action(guest, actor, target) {
 
     async function summonCharacter(playerNum, charId) {
         const char = characters[charId];
-        if (playerNum == 1) {
+        if (playerNum === 1) {
             playerSummonIcon.style.display = 'block';
             playerSummonDetail.style.display = 'block';
             playerSummonIcon.src = char.icon;
@@ -1773,7 +1773,7 @@ function toggleCloudEffect(actor) {
     const playerEffectElement = document.getElementById('player-effect');
     const enemyEffectElement = document.getElementById('enemy-effect');
     if (actor.invincible) {
-        if (actor.playerNum == 1) {
+        if (actor.playerNum === 1) {
             playerEffectElement.style.display = 'block'; // 表示
         } else {
             enemyEffectElement.style.display = 'block'; // 表示
@@ -1788,7 +1788,7 @@ function toggleCloudEffect(actor) {
 function fadeOutDice(actor) {
     return new Promise((resolve) => {
         let dice;
-        if (actor.playerNum == 1) {
+        if (actor.playerNum === 1) {
             dice = document.getElementById('player-dice');
         } else {
             dice = document.getElementById('enemy-dice');
@@ -1803,7 +1803,7 @@ function fadeOutDice(actor) {
 function fadeInDice(actor) {
     return new Promise((resolve) => {
         let dice;
-        if (actor.playerNum == 1) {
+        if (actor.playerNum === 1) {
             dice = document.getElementById('player-dice');
         } else {
             dice = document.getElementById('enemy-dice');

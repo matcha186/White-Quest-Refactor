@@ -150,6 +150,39 @@ const actions = {
     スマイル: smileAction
 };
 
+// キャラクターごとの固定値（最大HP・カード画像等）を1箇所に集約する
+const CHARACTERS = {
+    'Nakamu':    { job: '勇者',   maxHp: 170, spName: 'レベル: ', img: 'img/cards/HeroDetail.png',    iconImg: 'img/cards/HeroIcon.png',    firstDice: 'img/dice/dice1.png' },
+    'Broooock':  { job: '戦士',   maxHp: 180, spName: '軽減: ',   img: 'img/cards/WarriorDetail.png', iconImg: 'img/cards/WarriorIcon.png', firstDice: 'img/dice/dice2.png' },
+    'シャークん': { job: '盗賊',   maxHp: 150, spName: 'お金: ',   img: 'img/cards/ThiefDetail.png',   iconImg: 'img/cards/ThiefIcon.png',   firstDice: 'img/dice/dice3.png' },
+    'きんとき':   { job: '武闘家', maxHp: 160, spName: '被ダメ: ', img: 'img/cards/FighterDetail.png', iconImg: 'img/cards/FighterIcon.png', firstDice: 'img/dice/dice4.png' },
+    'スマイル':   { job: '賢者',   maxHp: 140, spName: '魔力: ',   img: 'img/cards/MageDetail.png',    iconImg: 'img/cards/MageIcon.png',    firstDice: 'img/dice/dice5.png' },
+    'きりやん':   { job: '魔王',   maxHp: 200, spName: '火炎: ',   img: 'img/cards/DevilDetail.png',   iconImg: 'img/cards/DevilIcon.png',   firstDice: 'img/dice/dice6.png' }
+};
+
+// キャラクターごとのSP初期値（お金・魔力など、固定値では表現できないもののみ関数化）
+function initialSpValue(name) {
+    switch (name) {
+        case 'Nakamu': return nakamuLevel;
+        case 'シャークん': return 3;
+        case 'スマイル': return 3;
+        case 'きりやん': return 'OFF';
+        default: return 0; // Broooock, きんとき
+    }
+}
+
+// player/enemy いずれかのオブジェクトに、CHARACTERSテーブルの内容を反映する
+function applyCharacterData(actor) {
+    const data = CHARACTERS[actor.name];
+    actor.job = data.job;
+    actor.hp = data.maxHp;
+    actor.spName = data.spName;
+    actor.spValue = initialSpValue(actor.name);
+    actor.img = data.img;
+    actor.iconImg = data.iconImg;
+    actor.firstDice = data.firstDice;
+}
+
 const imageMap = {
     'hero-choice': 'img/cards/Hero.png',
     'warrior-choice': 'img/cards/Warrior.png',
@@ -642,119 +675,9 @@ async function promptReroll() {
 }
 
 async function setChara() {
-    
-    switch (player.name) {
-        case 'Nakamu':
-            player.job = '勇者';
-            player.hp = 170;
-            player.spName = 'レベル: ';
-            player.spValue = nakamuLevel;
-            player.img = 'img/cards/HeroDetail.png';
-            player.iconImg = 'img/cards/HeroIcon.png';
-            player.firstDice = 'img/dice/dice1.png';
-            break;
-        case 'Broooock':
-            player.job = '戦士';
-            player.hp = 180;
-            player.spName = '軽減: ';
-            player.spValue = 0;
-            player.img = 'img/cards/WarriorDetail.png';
-            player.iconImg = 'img/cards/WarriorIcon.png';
-            player.firstDice = 'img/dice/dice2.png';
-            break;
-        case 'シャークん':
-            player.job = '盗賊';
-            player.hp = 150;
-            player.spName = 'お金: ';
-            player.spValue = 3;
-            player.img = 'img/cards/ThiefDetail.png';
-            player.iconImg = 'img/cards/ThiefIcon.png';
-            player.firstDice = 'img/dice/dice3.png';
-            break;
-        case 'きんとき':
-            player.job = '武闘家';
-            player.hp = 160;
-            player.spName = '被ダメ: ';
-            player.spValue = 0;
-            player.img = 'img/cards/FighterDetail.png';
-            player.iconImg = 'img/cards/FighterIcon.png';
-            player.firstDice = 'img/dice/dice4.png';
-            break;
-        case 'スマイル':
-            player.job = '賢者';
-            player.hp = 140;
-            player.spName = '魔力: ';
-            player.spValue = 3;
-            player.img = 'img/cards/MageDetail.png';
-            player.iconImg = 'img/cards/MageIcon.png';
-            player.firstDice = 'img/dice/dice5.png';
-            break;
-        case 'きりやん':
-            player.job = '魔王';
-            player.hp = 200;
-            player.spName = '火炎: ';
-            player.spValue = 'OFF';
-            player.img = 'img/cards/DevilDetail.png';
-            player.iconImg = 'img/cards/DevilIcon.png';
-            player.firstDice = 'img/dice/dice6.png';
-            break;
-    }
-    switch (enemy.name) {
-        case 'Nakamu':
-            enemy.job = '勇者';
-            enemy.hp = 170;
-            enemy.spName = 'レベル: ';
-            enemy.spValue = nakamuLevel;
-            enemy.img = 'img/cards/HeroDetail.png';
-            enemy.iconImg = 'img/cards/HeroIcon.png';
-            enemy.firstDice = 'img/dice/dice1.png';
-            break;
-        case 'Broooock':
-            enemy.job = '戦士';
-            enemy.hp = 180;
-            enemy.spName = '軽減: ';
-            enemy.spValue = 0;
-            enemy.img = 'img/cards/WarriorDetail.png';
-            enemy.iconImg = 'img/cards/WarriorIcon.png';
-            enemy.firstDice = 'img/dice/dice2.png';
-            break;
-        case 'シャークん':
-            enemy.job = '盗賊';
-            enemy.hp = 150;
-            enemy.spName = 'お金: ';
-            enemy.spValue = 3;
-            enemy.img = 'img/cards/ThiefDetail.png';
-            enemy.iconImg = 'img/cards/ThiefIcon.png';
-            enemy.firstDice = 'img/dice/dice3.png';
-            break;
-        case 'きんとき':
-            enemy.job = '武闘家';
-            enemy.hp = 160;
-            enemy.spName = '被ダメ: ';
-            enemy.spValue = 0;
-            enemy.img = 'img/cards/FighterDetail.png';
-            enemy.iconImg = 'img/cards/FighterIcon.png';
-            enemy.firstDice = 'img/dice/dice4.png';
-            break;
-        case 'スマイル':
-            enemy.job = '賢者';
-            enemy.hp = 140;
-            enemy.spName = '魔力: ';
-            enemy.spValue = 3;
-            enemy.img = 'img/cards/MageDetail.png';
-            enemy.iconImg = 'img/cards/MageIcon.png';
-            enemy.firstDice = 'img/dice/dice5.png';
-            break;
-        case 'きりやん':
-            enemy.job = '魔王';
-            enemy.hp = 200;
-            enemy.spName = '火炎: ';
-            enemy.spValue = 'OFF';
-            enemy.img = 'img/cards/DevilDetail.png';
-            enemy.iconImg = 'img/cards/DevilIcon.png';
-            enemy.firstDice = 'img/dice/dice6.png';
-            break;
-    }
+
+    applyCharacterData(player);
+    applyCharacterData(enemy);
 
     if (firstPlayer == '') {
         let turnNum = Math.floor(Math.random() * 2) + 1;
@@ -1161,12 +1084,12 @@ async function nakamuAction(dice, actor, target) {
             break;
         case 4: // 回復魔法で傷を癒す
             await log(actor.name + 'が回復魔法を発動！');
-            if (actor.hp == 170) {
+            if (actor.hp == CHARACTERS['Nakamu'].maxHp) {
                 await log('しかし、これ以上回復できない！');
             } else {
                 let beforeHP = actor.hp;
                 await healEffect(actor);
-                actor.hp = Math.min(actor.hp + 40, 170);
+                actor.hp = Math.min(actor.hp + 40, CHARACTERS['Nakamu'].maxHp);
                 displayHPandSP();
                 await log(actor.name + 'のHPが' + beforeHP + 'から' + actor.hp + 'に回復！');
             }
@@ -1287,23 +1210,23 @@ async function broooockAction(dice, actor, target, isNakamu) {
         case 6: // 宿屋で睡眠
             if (isNakamu) {
                 await log('Nakamuは宿屋で寝た。');
-                if (actor.hp == 170) {
+                if (actor.hp == CHARACTERS['Nakamu'].maxHp) {
                     await log('しかし、これ以上回復できない！/次のターン行動できなくなった。');
                 } else {
                     let beforeHP = actor.hp;
                     await healEffect(actor);
-                    actor.hp = Math.min(actor.hp + 100, 170);
+                    actor.hp = Math.min(actor.hp + 100, CHARACTERS['Nakamu'].maxHp);
                     displayHPandSP();
                     await log('NakamuのHPが' + beforeHP + 'から' + actor.hp + 'に回復！/次のターン行動できなくなった。');
                 }
             } else {
                 await log(actor.name + 'は宿屋で寝た。');
-                if (actor.hp == 180) {
+                if (actor.hp == CHARACTERS[actor.name].maxHp) {
                     await log('しかし、これ以上回復できない！');
                 } else {
                     let beforeHP = actor.hp;
                     await healEffect(actor);
-                    actor.hp = Math.min(actor.hp + 100, 180);
+                    actor.hp = Math.min(actor.hp + 100, CHARACTERS[actor.name].maxHp);
                     displayHPandSP();
                     await log(actor.name + 'のHPが' + beforeHP + 'から' + actor.hp + 'に回復！/次のターン行動できなくなった。');
                 }
@@ -1393,12 +1316,13 @@ async function sharkenAction(dice, actor, target, isNakamu) {
             break;
         case 4: // 雲隠れ
             await log(actor.name + 'の雲隠れ！');
-            if (actor.hp == 150) {
+            let sharkenMaxHp = isNakamu ? CHARACTERS['Nakamu'].maxHp : CHARACTERS[actor.name].maxHp;
+            if (actor.hp == sharkenMaxHp) {
                 await log('しかし、これ以上回復できない！');
             } else {
                 let beforeHP = actor.hp;
                 await healEffect(actor);
-                actor.hp = Math.min(actor.hp + 20, 150);
+                actor.hp = Math.min(actor.hp + 20, sharkenMaxHp);
                 displayHPandSP();
                 await log(actor.name + 'のHPが' + beforeHP + 'から' + actor.hp + 'に回復！');
             } 
@@ -1588,12 +1512,13 @@ async function smileAction(dice, actor, target, isNakamu) {
                 await log(target.name + 'に' + currentDamage3 + 'ダメージ！');
                 kintokiDamage(currentDamage3, target);
             }
-            if (actor.hp == 140) {
+            let smileMaxHp = isNakamu ? CHARACTERS['Nakamu'].maxHp : CHARACTERS[actor.name].maxHp;
+            if (actor.hp == smileMaxHp) {
                 await log('スマイルはこれ以上回復できない！');
             } else {
                 let beforeHP = actor.hp;
                 await healEffect(actor);
-                actor.hp = Math.min(actor.hp + 30, 140);
+                actor.hp = Math.min(actor.hp + 30, smileMaxHp);
                 displayHPandSP();
                 await log(actor.name + 'のHPが' + beforeHP + 'から' + actor.hp + 'に回復！');
             }

@@ -1602,10 +1602,10 @@ async function nakamu5Action(guest, actor, target) {
     const enemySummonDetail = document.getElementById('enemy-summon-detail');
 
     const characters = {
-        1: { name: 'Broooock', icon: '/img/cards/WarriorIcon.png', type: '戦士' },
-        2: { name: 'シャークん', icon: '/img/cards/ThiefIcon.png', type: '盗賊' },
-        3: { name: 'きんとき', icon: '/img/cards/FighterIcon.png', type: '武闘家' },
-        4: { name: 'スマイル', icon: '/img/cards/MageIcon.png', type: '賢者' }
+        1: { name: 'Broooock', icon: 'img/cards/WarriorIcon.png', type: '戦士' },
+        2: { name: 'シャークん', icon: 'img/cards/ThiefIcon.png', type: '盗賊' },
+        3: { name: 'きんとき', icon: 'img/cards/FighterIcon.png', type: '武闘家' },
+        4: { name: 'スマイル', icon: 'img/cards/MageIcon.png', type: '賢者' }
     };
 
     async function summonCharacter(playerNum, charId) {

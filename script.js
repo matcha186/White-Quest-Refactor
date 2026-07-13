@@ -1846,8 +1846,9 @@ async function nakamu5Action(guest, actor, target) {
     actor.name = 'Nakamu';
 }
 
-function replay() {
-    document.getElementById('replay-dialog').style.display = 'none';
+// 新しい試合を始める前に、キャラクター固有のアビリティフラグと player/enemy の戦闘状態をまとめてリセットする
+// (旧実装では replay()/returnTop() がそれぞれ個別にリセットしており、項目の食い違いによる状態持ち越しバグがあった)
+function resetBattleState() {
     nakamuLevel = 1;
     isNakamuChoice = false;
     isNakamuSummon = 0;
@@ -1862,6 +1863,22 @@ function replay() {
     isSmile6 = false;
     isKiriyan2 = false;
     isKiriyan5 = false;
+
+    nakamuBeforeDamage = 0;
+
+    player.shieldDamage = 0;
+    player.turnSkip = false;
+    player.invincible = false;
+    player.marunomi = false;
+    enemy.shieldDamage = 0;
+    enemy.turnSkip = false;
+    enemy.invincible = false;
+    enemy.marunomi = false;
+}
+
+function replay() {
+    document.getElementById('replay-dialog').style.display = 'none';
+    resetBattleState();
     setChara();
     turnCount = 1;
     playerIcon.style.opacity = '1';
@@ -1882,33 +1899,10 @@ function returnTop() {
 
     isTurnEnd = false;
 
-    nakamuLevel = 1;
-    isNakamuChoice = false;
-    isNakamuSummon = 0;
-    nakamuCoins = 3;
-    nakamuMP = 3;
-    currentGuest = '';
-    currentNakamuChoice = '';
-    isSharken6 = false;
-    kintokiMoreTurn = false;
-    isKintoki6 = false;
-    isSmile2 = false;
-    isSmile6 = false;
-    isKiriyan2 = false;
-    isKiriyan5 = false;
-
-    nakamuBeforeDamage = 0;
+    resetBattleState();
 
     player.name = '';
     enemy.name = '';
-    player.shieldDamage =  0;
-    player.turnSkip = false;
-    player.invincible = false;
-    player.marunomi = false;
-    enemy.shieldDamage =  0;
-    enemy.turnSkip = false;
-    enemy.invincible = false;
-    enemy.marunomi = false;
 
     heroChoice.classList.remove('disabled');
     heroChoice.disabled = false;

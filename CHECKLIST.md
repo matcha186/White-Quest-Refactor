@@ -35,7 +35,7 @@
 
 - [x] **キャラクターデータテーブル化**：`CHARACTERS` オブジェクトを新設し、`setChara()` の並行switch文をルックアップに置き換える。最大HPもここに集約し、`actor.hp == 170` 等のマジックナンバー比較を置き換える（→④の根本解消、マジックナンバー散在の解消）
   - [x] 置き換え中に新規バグ⑮を発見・修正（Nakamu召喚時のシャークん/スマイルの回復がHPを削ってしまう問題。詳細はBUGS.md参照）
-- [ ] **状態リセットの統一**：`resetBattleState()` を新設し、`player`/`enemy` の `shieldDamage`/`turnSkip`/`invincible`/`marunomi` と `nakamuBeforeDamage` をまとめてリセット。`replay()`/`returnTop()` の両方から呼ぶ（→⑪の根本解消）
+- [x] **状態リセットの統一**：`resetBattleState()` を新設し、`player`/`enemy` の `shieldDamage`/`turnSkip`/`invincible`/`marunomi` と `nakamuBeforeDamage` をまとめてリセット。`replay()`/`returnTop()` の両方から呼ぶ（→⑪の根本解消）
 - [ ] **共通ダメージ関数の導入**：`applyDamage(rawDamage, target)` を新設（`filterDamage()`→`damageEffect()`→HP減算(0クランプ込み)→`displayHPandSP()`→ログ→`kintokiDamage()`）。各キャラクターの `...Action()` 内の同型処理を置き換える（→⑤⑥⑭の根本解消）。1キャラクターずつ置き換えて都度動作確認する
   - [ ] Nakamu (`nakamuAction`)
   - [ ] Broooock (`broooockAction`)

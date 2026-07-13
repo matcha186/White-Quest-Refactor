@@ -1,3 +1,5 @@
+'use strict';
+
 var choiceLog = {
     player: '1P: キャラクターを選択してください',
     enemy: '2P: キャラクターを選択してください',
@@ -74,7 +76,6 @@ let currentChoicePlayer = 1;
 let playerCharaNum = 0;
 let firstPlayer = 'player';
 let turnCount = 1;
-let logEnd = false;
 let cancelLog = false;
 let isClick = false;
 let currentPlayer = '';
@@ -99,7 +100,6 @@ let isSmile2 = false;
 let isSmile6 = false;
 let isKiriyan2 = false;
 let isKiriyan5 = false;
-let isKiriyan6 = false;
 
 let nakamuBeforeDamage = 0;
 
@@ -429,8 +429,8 @@ async function npcBattle() {
         await log(battleLog.cpuFirst + '/' + enemy.name + battleLog.diceEnemy, true);
     }
     
-    while (player.hp > 0 || enemy.hp > 0) {
-        await turnStart();
+    while (player.hp > 0 && enemy.hp > 0) {
+        await turnStartEnemy();
     }
 }
 
@@ -721,7 +721,6 @@ async function setChara() {
         case 'シャークん':
             enemy.job = '盗賊';
             enemy.hp = 150;
-            enemy.hp = 150;
             enemy.spName = 'お金: ';
             enemy.spValue = 3;
             enemy.img = 'img/cards/ThiefDetail.png';
@@ -870,7 +869,7 @@ function healEffect(actor) {
 }
 
 function decideTurn() {
-    turnDecideButton = document.getElementById('turn-decide-button');
+    const turnDecideButton = document.getElementById('turn-decide-button');
 
     if (firstPlayer == '') {
         turnDecideButton.innerHTML = '1P';
@@ -1276,7 +1275,7 @@ async function broooockAction(dice, actor, target, isNakamu) {
             await damageEffect(actor);
             displayHPandSP();
             await log(actor.name + 'は20ダメージを受けた。');
-            currentDamage5 = await filterDamage(70, target);
+            let currentDamage5 = await filterDamage(70, target);
             if (currentDamage5 != 0) {
                 target.hp -= currentDamage5;
                 await damageEffect(target);
@@ -1951,7 +1950,6 @@ function returnTop() {
     playerCharaNum = 0;
     firstPlayer = 'player';
     turnCount = 1;
-    logEnd = false;
     cancelLog = false;
     isClick = false;
     currentPlayer = '';

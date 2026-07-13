@@ -66,8 +66,8 @@ const enemyDice = document.getElementById('enemy-dice');
 
 const charaCard = document.getElementById('choice-card');
 const nakamuCharaCard = document.getElementById('nakamu-choice-card');
-// const playerDiceSelect = document.getElementById('player-dice-select');
-// const enemyDiceSelect = document.getElementById('enemy-dice-select');
+const playerDiceSelect = document.getElementById('player-dice-select');
+const enemyDiceSelect = document.getElementById('enemy-dice-select');
 
 const rerollDialog = document.getElementById('reroll-dialog');
 
@@ -195,13 +195,13 @@ const imageMap = {
 
 const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
-// playerDiceSelect.addEventListener('change', (event) => { // デバッグ用
-//     playerDiceNum = parseInt(event.target.value);
-// });
+playerDiceSelect.addEventListener('change', (event) => { // デバッグ用
+    playerDiceNum = parseInt(event.target.value);
+});
 
-// enemyDiceSelect.addEventListener('change', (event) => { // デバッグ用
-//     enemyDiceNum = parseInt(event.target.value);
-// });
+enemyDiceSelect.addEventListener('change', (event) => { // デバッグ用
+    enemyDiceNum = parseInt(event.target.value);
+});
 
 document.getElementById('log-speed-select').addEventListener('change', (event) => {
     logspeed = parseInt(event.target.value);

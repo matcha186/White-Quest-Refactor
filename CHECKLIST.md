@@ -60,8 +60,12 @@
 ## フェーズ4：スタイルクリーンアップ
 
 - [x] `==`/`!=` を `===`/`!==` に統一(93箇所。全ファイル通しで同一型同士の比較のみだったため機械的に置換可能と確認済み)
-- [ ] ビジーウェイト（`isClick`, `isTurnEnd`, `isNakamuChoice`）を Promise/`resolve()` パターンに書き換え
-- [ ] `var`（`rollDice()` 内）を `let`/`const` に統一
+- [x] ビジーウェイトを解消
+  - [x] `isTurnEnd`：調査の結果、`charaAction()`/`skipBroKiri()` は既に `await` で呼び出されており、ループに到達する時点で必ず true になっている死んだコードと判明。Promise化ではなく変数ごと削除
+  - [x] `isClick`（`decideName()`）：クリックハンドラをモジュールスコープの固定関数にし、Promiseの`resolve`を使う方式に書き換え。副産物として`isClick`変数自体を削除
+  - [x] `isNakamuChoice`（友情コンボのキャラ選択待ち）：`waitForNakamuChoice()` を新設しPromiseで待機するよう書き換え(ホバープレビュー抑制用のフラグとしての役割は維持)
+  - [x] `rollDice()` の `diceRollState.isDice` ポーリングも同様にPromiseの`resolve`方式に統一
+- [x] `var`（トップレベルの`choiceLog`/`battleLog`/`charaNumArray`）を `const` に統一(`rollDice()`内の`var`は⑬対応時に`let`へ統一済み)
 
 ## フェーズ5：通し動作確認（ブラウザ実プレイ）
 

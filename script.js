@@ -1,12 +1,12 @@
 'use strict';
 
-var choiceLog = {
+const choiceLog = {
     player: '1P: キャラクターを選択してください',
     enemy: '2P: キャラクターを選択してください',
     cpu: 'CPU: キャラクターを選択してください'
 }
 
-var battleLog = {
+const battleLog = {
     startNPC: ' が あらわれた！',
     playerFirst: 'あなたは先攻です。',
     cpuFirst: 'CPUが先攻です。',
@@ -19,7 +19,7 @@ var battleLog = {
     kintokiMoreTurnLog: 'きんときの追加ターン！'
 }
 
-var charaNumArray = {
+const charaNumArray = {
     1: 'Nakamu',
     2: 'Broooock',
     3: 'シャークん',
@@ -77,14 +77,11 @@ let playerCharaNum = 0;
 let firstPlayer = 'player';
 let turnCount = 1;
 let cancelLog = false;
-let isClick = false;
 let currentPlayer = '';
 let currentDiceNum = 0;
 
 let playerDiceNum = 0;
 let enemyDiceNum = 0;
-
-let isTurnEnd = false;
 
 let nakamuLevel = 1;
 let isNakamuChoice = false;
@@ -324,6 +321,17 @@ for (let i = 0; i < nakamuChoice.length; i++) {
     nakamuChoice[i].addEventListener('click', function() {
         currentNakamuChoice = this.id;
         isNakamuChoice = true;
+        if (resolveNakamuChoice) {
+            resolveNakamuChoice();
+            resolveNakamuChoice = null;
+        }
+    });
+}
+
+let resolveNakamuChoice = null;
+function waitForNakamuChoice() {
+    return new Promise((resolve) => {
+        resolveNakamuChoice = resolve;
     });
 }
 
@@ -379,8 +387,6 @@ async function choice() {
     decideButton.disabled = true;
     decideButton.classList.add('disabled');
 
-    isClick = false;
-    
     await playerLogPromise;
     cancelLog = false;
 
@@ -399,21 +405,26 @@ async function choice() {
     cancelLog = false;
 }
 
+let resolveDecideNameClick = null;
+
+function handleDecideNameClick() {
+    cancelLog = true;
+    charaCard.style.display = 'none';
+    if (resolveDecideNameClick) {
+        resolveDecideNameClick();
+        resolveDecideNameClick = null;
+    }
+}
+
 async function decideName() {
     let result = null;
 
-    decideButton.removeEventListener('click', handleClick);
-    decideButton.addEventListener('click', handleClick);
+    decideButton.removeEventListener('click', handleDecideNameClick);
+    decideButton.addEventListener('click', handleDecideNameClick);
 
-    function handleClick() {
-        cancelLog = true;
-        charaCard.style.display = 'none';
-        isClick = true;
-    }
-
-    while (!isClick) {
-        await sleep(1);
-    }
+    await new Promise((resolve) => {
+        resolveDecideNameClick = resolve;
+    });
 
     switch (currentChoice) {
         case 'hero-choice':
@@ -494,7 +505,6 @@ async function enemyBattle() {
 }
 
 async function turnStartEnemy() {
-    isTurnEnd = false;
     console.log(turnCount + 'ターン目開始');
     turnCountText.innerHTML = Math.floor((turnCount + 1) / 2) + 'ターン目';
     // turnCountText.innerHTML = (turnCount + 1) / 2 + 'ターン目';
@@ -613,10 +623,6 @@ async function turnStartEnemy() {
 
     otherActor.shieldDamage = 0;
 
-    while (!isTurnEnd) {
-        await sleep(1);
-    }
-
     if (otherActor.name === 'Broooock') {
         otherActor.spValue = 0;
     }
@@ -646,7 +652,6 @@ async function skipBroKiri(actor) {
         await log(battleLog.rightTurn + `/${actor.name}は${messages[actor.name]}`);
     }
     actor.turnSkip = false;
-    isTurnEnd = true;
 }
 
 async function promptReroll() {
@@ -876,11 +881,11 @@ function randomDecide() {
 // ハンドラをモジュールスコープの固定参照にし、状態は diceRollState にまとめることで
 // 呼び出しのたびに removeEventListener → addEventListener で確実に1つだけに保つ。
 let diceRollState = {
-    isDice: false,
     isRollStarted: false,
     diceInterval: null,
     previousDiceNumber: null,
-    diceResult: null
+    diceResult: null,
+    resolve: null
 };
 
 function rollDiceLogic(diceNum, setImageSrc) {
@@ -905,7 +910,7 @@ function onPlayerDiceClick() {
         diceRollState.isRollStarted = false;
         diceRollState.diceResult = diceRollState.previousDiceNumber;
         playerDice.src = `img/dice/dice${diceRollState.diceResult}.png`;
-        diceRollState.isDice = true;
+        diceRollState.resolve(diceRollState.diceResult);
     } else {
         diceRollState.diceInterval = setInterval(() => {
             diceRollState.previousDiceNumber = rollDiceLogic(playerDiceNum, src => playerDice.src = src);
@@ -921,7 +926,7 @@ function onEnemyDiceClick() {
         diceRollState.isRollStarted = false;
         diceRollState.diceResult = diceRollState.previousDiceNumber;
         enemyDice.src = `img/dice/dice${diceRollState.diceResult}.png`;
-        diceRollState.isDice = true;
+        diceRollState.resolve(diceRollState.diceResult);
     } else {
         diceRollState.diceInterval = setInterval(() => {
             diceRollState.previousDiceNumber = rollDiceLogic(enemyDiceNum, src => enemyDice.src = src);
@@ -932,27 +937,23 @@ function onEnemyDiceClick() {
 }
 
 async function rollDice() {
-    diceRollState = {
-        isDice: false,
-        isRollStarted: false,
-        diceInterval: null,
-        previousDiceNumber: null,
-        diceResult: null
-    };
+    return new Promise((resolve) => {
+        diceRollState = {
+            isRollStarted: false,
+            diceInterval: null,
+            previousDiceNumber: null,
+            diceResult: null,
+            resolve
+        };
 
-    if (currentPlayer === 'player') {
-        playerDiceButton.removeEventListener('click', onPlayerDiceClick);
-        playerDiceButton.addEventListener('click', onPlayerDiceClick);
-    } else if (currentPlayer === 'enemy') {
-        enemyDiceButton.removeEventListener('click', onEnemyDiceClick);
-        enemyDiceButton.addEventListener('click', onEnemyDiceClick);
-    }
-
-    while (!diceRollState.isDice) {
-        await sleep(1);
-    }
-
-    return diceRollState.diceResult;
+        if (currentPlayer === 'player') {
+            playerDiceButton.removeEventListener('click', onPlayerDiceClick);
+            playerDiceButton.addEventListener('click', onPlayerDiceClick);
+        } else if (currentPlayer === 'enemy') {
+            enemyDiceButton.removeEventListener('click', onEnemyDiceClick);
+            enemyDiceButton.addEventListener('click', onEnemyDiceClick);
+        }
+    });
 }
 
 function buttonAble(num) {
@@ -1010,27 +1011,21 @@ async function charaAction(dice, actor, target) {
     switch (actor.name) {
         case 'Nakamu':
             await nakamuAction(dice, actor, target);
-            isTurnEnd = true;
             break;
         case 'Broooock':
             await broooockAction(dice, actor, target);
-            isTurnEnd = true;
             break;
         case 'シャークん':
             await sharkenAction(dice, actor, target);
-            isTurnEnd = true;
             break;
         case 'きんとき':
             await kintokiAction(dice, actor, target);
-            isTurnEnd = true;
             break;
         case 'スマイル':
             await smileAction(dice, actor, target);
-            isTurnEnd = true;
             break;
         case 'きりやん':
             await kiriyanAction(dice, actor, target);
-            isTurnEnd = true;
             break;
     }
 }
@@ -1100,9 +1095,7 @@ async function nakamuAction(dice, actor, target) {
                     break;
             }
             document.getElementById('chara-select-dialog').style.display = 'flex';
-            while(!isNakamuChoice) {
-                await sleep(1);
-            }
+            await waitForNakamuChoice();
             document.getElementById('chara-select-dialog').style.display = 'none';
             isNakamuChoice = false;
             switch (currentNakamuChoice) {
@@ -1737,11 +1730,8 @@ function returnTop() {
     firstPlayer = 'player';
     turnCount = 1;
     cancelLog = false;
-    isClick = false;
     currentPlayer = '';
     currentDiceNum = 0;
-
-    isTurnEnd = false;
 
     resetBattleState();
 

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White Quest</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="icon.ico">
+</head>
+<body>
+    <div id="debug">
+        <!-- <button id="damage" onclick="damageEffect()">揺らす</button> -->
+        <div id="debug-container1">
+            <!-- <div>
+                <label for="player-dice-select">プレイヤーのダイス目設定:</label>
+                <select id="player-dice-select">
+                    <option value="0">ランダム</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </div>
+            <div>
+                <label for="enemy-dice-select">敵のダイス目設定:</label>
+                <select id="enemy-dice-select">
+                    <option value="0">ランダム</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </div> -->
+            <div>
+                <lavel for="log-speed-select">ログの速さ設定</lavel>
+                <select id="log-speed-select">
+                    <option value="100">遅い</option>
+                    <option value="75" selected>普通</option>
+                    <option value="50">速い</option>
+                    <option value="25">高速</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="debug-container2">
+            <!-- <button onclick="fadeOutDice()">ダイス消える</button>
+            <button onclick="fadeInDice()">ダイス現る</button> -->
+        </div>
+    </div>
+    
+    <div id="game-container">
+
+        <div id="start-display"></div>
+
+        <div id="choice-display">
+            <div id="choice-left-div">
+                <div id="random-button-contains">
+                    <button id="random-button" onclick="randomButtonEnter()">ランダム</button>
+                </div>
+                <div id="choice-button-contains">
+                    <button id="hero-choice" class="choice-button">勇者</button>
+                    <button id="warrior-choice" class="choice-button">戦士</button>
+                    <button id="thief-choice" class="choice-button">盗賊</button>
+                    <button id="fighter-choice" class="choice-button">武闘家</button>
+                    <button id="mage-choice" class="choice-button">賢者</button>
+                    <button id="devil-choice" class="choice-button">魔王</button>    
+                </div>
+                <div id="decide-button-contains">
+                    <button id="decide-button">決定</button>
+                </div>
+                <div id="turn-decide">先攻 → 
+                    <button id="turn-decide-button" onclick="decideTurn()">1P</button>
+                </div>
+                
+            </div>
+            <div id="choice-right-div">
+                <img src="" alt="card" id="choice-card">
+            </div>
+        </div>
+
+        <div id="game-display">
+            <div id="player-div" class="player-div">
+                <p>
+                    <span id="player-job" class="job"></span><br>
+                    <span id="player-name" class="name"></span><br>
+                    <span id="player-hp" class="hp"></span><br>
+                    <span id="player-sp" class="sp"></span><br>
+                    <span id="player-turn" class="turn"></span>
+                </p>
+                <img src="" alt="card" id="player-card">
+                <img src="" alt="icon" id="player-icon" class="icon">
+                <img src="" alt="summon-icon" id="player-summon-icon" class="summon-icon">
+                <div id="player-summon-detail" class="summon-detail">召還キャラ</br>詳細</div>
+                <div id="player-dice-container">
+                    <img src="" alt="card" id="player-dice">
+                    <button id="player-dice-button" class="dice-button">回す</button>
+                </div>
+            </div>
+            <div id="enemy-div" class="player-div">
+                <p>
+                    <span id="enemy-job" class="job"></span><br>
+                    <span id="enemy-name" class="name"></span><br>
+                    <span id="enemy-hp" class="hp"></span><br>
+                    <span id="enemy-sp" class="sp"></span><br>
+                    <span id="enemy-turn" class="turn"></span>
+                </p>
+                <img src="" alt="card" id="enemy-card">
+                <img src="" alt="icon" id="enemy-icon" class="icon">
+                <img src="" alt="summon-icon" id="enemy-summon-icon" class="summon-icon">
+                <div id="enemy-summon-detail" class="summon-detail">召還キャラ</br>詳細</div>
+                <img src="" alt="card" id="enemy-dice">
+                <button id="enemy-dice-button" class="dice-button">回す</button>
+            </div>
+            <div id="turn-count"></div>
+            <img src="" alt="card" id="nakamu-choice-card">
+        </div>
+
+        <div id="log-container">
+            <div id="log-text"></div>
+            <div id="reroll-dialog" style="display: none;">
+                <button id="reroll-button" class="reroll">はい</button>
+                <button id="no-reroll-button" class="reroll">いいえ</button>
+            </div>
+            <div id="chara-select-dialog">
+                <button id="broooock" class="nakamu5">戦士</br>Broooock</button>
+                <button id="sharken" class="nakamu5">盗賊</br>シャークん</button>
+                <button id="kintoki" class="nakamu5">武闘家</br>きんとき</button>
+                <button id="smile" class="nakamu5">賢者</br>スマイル</button>
+            </div>
+            <div id="replay-dialog">
+                <button id="replay" onclick="replay()">同じキャラでリプレイ</button>
+                <button id="top" onclick="returnTop()">キャラ選択に戻る</button>
+            </div>
+        </div>
+        <p id="game-rule">※体力は上限以上に回復しないよ！</p>
+        <div id="player-effect">
+            <div class="cloud"></div>
+        </div>
+        <div id="enemy-effect">
+            <div class="cloud"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

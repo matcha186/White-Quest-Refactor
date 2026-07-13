@@ -1,0 +1,672 @@
+@font-face {
+    font-family: 'PixelMplus12-Regular';
+    src: url('fonts/PixelMplus12-Regular.ttf') format('truetype');
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: gray;
+    font-family: 'PixelMplus12-Regular', sans-serif;
+    user-select:none;
+    -webkit-user-select:none;
+    -ms-user-select: none;
+    -moz-user-select:none;
+    -khtml-user-select:none;
+    -webkit-user-drag:none;
+    -khtml-user-drag:none;
+    overflow: hidden;
+}
+
+img {
+	pointer-events: none;
+}
+
+button {
+    font-family: 'PixelMplus12-Regular', sans-serif;
+}
+
+#game-container {
+    position: relative;
+}
+
+#game-display {
+    width: 720px;
+    height: 540px;
+    background-color: #000;
+    border: 10px solid #fff;
+    border-radius: 50px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-10px, -10px); }
+    40% { transform: translate(12px, 10px); }
+    60% { transform: translate(-8px, -5px); }
+    80% { transform: translate(-6px, 10px); }
+}
+
+.shake {
+    animation: shake 0.2s ease;
+}
+
+#log-container {
+    width: 650px;
+    height: 110px;
+    background-color: #000;
+    border: 8px solid #fff;
+    border-radius: 20px;
+    z-index: 10;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 350px;
+    bottom : -15px;
+    margin:  auto;
+}
+
+#log-text {
+    margin: 10px;
+    margin-left: 15px;
+    line-height:43px;
+    font-size: 30px;
+    color: #fff;
+}
+
+.player-div {
+    height: 520px;
+    width: 360px;
+    padding: 10px;
+}
+
+#player-div {
+    /* background-color: rgb(255, 154, 154); */
+    color: #fff;
+    text-align: left;
+    display: flex;
+    flex-flow: column;
+}
+
+.enemy-div {
+    height: 520px;
+    width: 360px;
+    padding: 10px;
+}
+
+#enemy-div {
+    /* background-color: rgb(154, 154, 255); */
+    color: #FFF;
+    text-align: right;
+    display: flex;
+    flex-flow: column;
+}
+
+#player-card {
+    width: 250px;
+    height: 155px;
+    position: absolute;
+    left: 100px;
+    top: 225px;
+}
+
+#enemy-card {
+    width: 250px;
+    height: 155px;
+    position: absolute;
+    right: 100px;
+    top: 225px;
+}
+
+.icon {
+    position: absolute;
+    width: 200px;
+    height: 124px;
+    top: 101px;
+}
+
+#player-icon {
+    left: 150px;
+    opacity: 1;
+}
+
+#enemy-icon {
+    right: 150px;
+    opacity: 1;
+}
+
+.job {
+    font-size: 20px;
+    line-height: 25px;
+}
+
+.name {
+    font-size: 35px;
+    line-height: 45px;
+}
+
+.hp {
+    font-size: 30px;
+    line-height: 40px;
+}
+
+.sp {
+    font-size: 20px;
+    line-height: 30px;
+}
+
+.turn {
+    font-size: 20px;
+    line-height: 30px;
+}
+
+/* #start-display {
+
+} */
+
+#choice-display {
+    width: 720px;
+    height: 540px;
+    background-color: #000;
+    border: 10px solid #fff;
+    border-radius: 50px;
+    position: absolute;
+    z-index: 4;
+    display: flex;
+}
+
+#choice-left-div {
+    width: 360px;
+    height: 390px;
+    /* background-color: aqua; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+}
+
+#choice-right-div {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 360px;
+    height: 390px;
+    /* background-color: pink; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.choice-button {
+    width: 80px;
+    height: 40px;
+    margin: 10px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: #FFF;
+    color: #000;
+    font-size: 20px;
+}
+
+#choice-button-contains {
+    /* background-color: aquamarine; */
+    width: 320px;
+    position: relative;
+    margin-top: 75px;
+}
+
+#decide-button-contains {
+    /* background-color: pink; */
+    width: 320px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#choice-card {
+    width: 250px;
+    height: auto;
+    display: none;
+    /* image-rendering: pixelated; */
+}
+
+#nakamu-choice-card {
+    position: absolute;
+    width: 225px;
+    height: auto;
+    top: -110px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    display: none;
+    background-color: rgba(255, 255, 255, 10);
+    border-radius: 5px;
+    box-shadow: #fff 0 0 10px,#fff 0 0 10px,#fff 0 0 10px,#fff 0 0 10px;
+}
+
+#hero-choice {
+    background-color: aqua;
+}
+
+#warrior-choice {
+    background-color: rgb(231, 0, 0);
+    color: #FFF;
+}
+
+#thief-choice {
+    background-color: rgb(0, 255, 0);
+}
+
+#fighter-choice {
+    background-color: #0e00ce;
+    color: #FFF;
+}
+
+#mage-choice {
+    background-color: #a800d2;
+    color: #FFF;
+}
+
+#devil-choice {
+    background-color: yellow;
+}
+
+.disabled {
+    opacity: 0.5;
+}
+
+#decide-button {
+    width: 80px;
+    height: 40px;
+    margin: 10px;
+    font-weight: bold;
+    border-radius: 10px;
+    background-color: #FFF;
+    color: #000;
+    font-size: 20px;
+    font-family: 'PixelMplus12-Regular', sans-serif;
+    cursor: pointer;
+}
+
+#random-button-contains {
+    /* background-color: aquamarine; */
+    width: 320px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    margin-bottom: 260px;
+}
+
+#random-button {
+    width: 160px;
+    height: 40px;
+    margin: 10px;
+    font-weight: bold;
+    border-radius: 10px;
+    background-color: #FFF;
+    color: #000;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#damage {
+    height: 50px;
+    width: 100px;
+    /* position: absolute; */
+    /* left: -25px;
+    top: 20px; */
+    margin: 0;
+}
+
+#debug {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+}
+
+#debug-container1 {
+    display: flex;
+    flex-flow: column;
+}
+
+#debug-container2 {
+    display: flex;
+    flex-flow: column;
+}
+
+#turn-count {
+    position: absolute;
+    color: #FFF;
+    /* background-color: aquamarine; */
+    right: 0;
+    left: 0;
+    margin: 10px auto;
+    text-align: center;
+    font-size: large;
+}
+
+#player-dice {
+    position: absolute;
+    width: 75px;
+    height: auto;
+    margin-top: 50px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+#player-dice.hidden {
+    opacity: 0;
+}
+
+#enemy-dice {
+    width: 75px;
+    height: auto;
+    margin-left: auto;
+    margin-top: 50px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+#enemy-dice.hidden {
+    opacity: 0;
+}
+
+#player-dice-button {
+    position: absolute;
+    margin-top: 135px;
+}
+
+#enemy-dice-button{
+    position: absolute;
+    bottom: 160px;
+    margin: 10px;
+    right: 0;
+}
+
+.dice-button {
+    width: 75px;
+    height: 25px;
+    background-color: #000;
+    color: #FFF;
+    border: 2px solid #FFF;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.dice-button:hover {
+    background-color: #FFF;
+    color: #000;
+}
+
+.dice-button:active {
+    -webkit-transform: translate(0,2px);
+	-moz-transform: translate(0,2px);
+	transform: translate(0,2px);
+	border-bottom:none;
+}
+
+#turn-decide {
+    color: #FFF;
+    font-size: 20px;
+}
+
+#turn-decide-button {
+    width: 60px;
+    height: 30px;
+    color: #FFF;
+    font-size: 20px;
+    background-color: #000;
+    border: 2px solid #FFF;
+    border-radius: 10px;
+    position: relative;
+    margin-left: 0px;
+}
+
+#turn-decide-button:hover {
+    background-color: #FFF;
+    color: #000;
+}
+
+#turn-decide-button:active {
+    top: 2px;
+}
+
+.sp-div {
+    position: absolute;
+    background-color: rgb(169, 0, 191);
+    border-radius: 100%;
+    width: 80px;
+    height: 115px;
+    margin-top: 255px;
+    display: flex;
+    flex-direction: column; /* Á∏¶„Å´‰∏¶„Åπ„Ç? */
+    justify-content: center; /* ‰∏ä‰∏ã‰∏≠Â§Æ„Å´ÈÖçÁΩÆ */
+    align-items: center; /* Â∑¶Âè≥‰∏≠Â§Æ„Å´ÈÖçÁΩÆ */
+    padding-top: 5px;
+}
+
+.sp-text, .sp-value {
+    font-size: 30px;
+    margin: 5px;
+}
+
+@keyframes damage {
+    0% {
+      color: red;
+    }
+    100% {
+      color: white;
+    }
+  }
+  
+.damage-fade {
+animation: damage 0.5s ease-in-out forwards;
+}
+
+@keyframes heal {
+    0% {
+      color: rgb(0, 255, 0);
+    }
+    100% {
+      color: white;
+    }
+  }
+  
+.heal-fade {
+animation: heal 0.5s ease-in-out forwards;
+}
+
+#reroll-dialog {
+    margin-top: 10px;
+    margin-left: 25px;
+}
+
+.reroll {
+    width: 100px;
+    height: 25px;
+}
+
+#chara-select-dialog {
+    /* background-color: #0e00ce; */
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    height: 50px;
+    /* padding-left: -200px; */
+    display: none;
+}
+.nakamu5 {
+    width: 120px;
+    height: 45px;
+    margin-left: 10px;
+    font-size: 18px;
+    margin-top: -17px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    display: block;
+    /* display: none; */
+}
+
+#broooock {
+    background-color: rgb(231, 0, 0);
+    color: #FFF;
+}
+
+#sharken {
+    background-color: rgb(0, 255, 0);
+}
+
+#kintoki {
+    background-color: #0e00ce;
+    color: #FFF;
+}
+
+#smile {
+    background-color: #a800d2;
+    color: #FFF;
+}
+
+.summon-icon {
+    position: absolute;
+    width: 100px;
+    top: 39px;
+}
+
+#player-summon-icon {
+    left: 34.7%;
+    display: none;
+}
+
+#enemy-summon-icon {
+    display: none;
+}
+
+#player-summon-detail {
+    left: 155px;
+    top: 48px;
+    display: none;
+}
+
+#enemy-summon-detail {
+    right: 155px;
+    top: 48px;
+    display: none;
+}
+
+#player-summon-detail:hover {
+    color: #000;
+    background-color: #FFF;
+}
+
+#enemy-summon-detail:hover {
+    color: #000;
+    background-color: #FFF;
+}
+
+.summon-detail {
+    position: absolute;
+    width: 85px;
+    height: 40px;
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid #FFF;
+    line-height: 20px;
+}
+
+#replay-dialog {
+    margin-left: 15px;
+    display: none;
+}
+
+#replay {
+    font-size: 20px;
+}
+
+#top {
+    font-size: 20px;
+}
+
+#game-rule {
+    position: absolute;
+    bottom: -40px;
+    right: 0;
+}
+
+#player-effect {
+    display: none; /* èâä˙èÛë‘Ç≈ÇÕîÒï\é¶ */
+    position: absolute;
+    top: 111px;
+    left: 159px;
+    width: 200px;
+    height: 124px;
+    pointer-events: none;
+}
+
+#enemy-effect {
+    display: none; /* èâä˙èÛë‘Ç≈ÇÕîÒï\é¶ */
+    position: absolute;
+    top: 111px;
+    left: 380px;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.cloud{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 200px;
+    height: 124px;
+    background: url('img/effects/cloud.png');
+    z-index: 30;
+    animation: cloud 60s linear infinite;
+}
+
+.cloud:before{
+    content: '';
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 200px;
+    height: 124px;
+    background: url('img/effects/cloud.png');
+    z-index: 30;
+    opacity:0.9;
+    animation: cloud-reverse 120s linear infinite;
+}
+
+@keyframes cloud{
+    0%{
+        background-position: 0px;
+    }
+
+    100%{
+          background-position: 5440px;
+    }
+
+}
+
+@keyframes cloud-reverse{
+    0%{
+        background-position: 5440px;
+    }
+
+    100%{
+          background-position: 0px;
+    }
+
+}

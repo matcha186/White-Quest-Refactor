@@ -608,14 +608,7 @@ async function turnStartEnemy() {
     if (isKiriyan2) { // きりやん火傷
         if (currentActor.name != 'きりやん') {
             await log(currentActor.name + 'は火傷による/継続ダメージを受けた！');
-            let currentDamage = await filterDamage(10, otherActor);
-            if (currentDamage != 0) {
-                await damageEffect(currentActor);
-                currentActor.hp -= currentDamage;
-                displayHPandSP();
-                await log(currentActor.name + 'に' + currentDamage + 'ダメージ！');
-                kintokiDamage(currentDamage, currentActor);
-            }
+            await applyDamage(10, currentActor);
         }
     }
 
@@ -1031,15 +1024,7 @@ async function nakamuAction(dice, actor, target) {
     switch (dice) {
         case 1: // 素早い剣さばき
             await log(actor.name + 'の素早い剣さばき！');
-            let currentDamage = 40 + addDamage;
-            let currentDamage1 = await filterDamage(currentDamage, target);
-            if (currentDamage1 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage1;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage1 + 'ダメージ！');
-                kintokiDamage(currentDamage1, target);
-            }
+            await applyDamage(40 + addDamage, target);
             break;
         case 2: // 光の魔法を発動
             await log(actor.name + 'が光の魔法を発動！' + '/' + 'サイコロの目×10ダメージ！', true);
@@ -1053,34 +1038,20 @@ async function nakamuAction(dice, actor, target) {
             playerDiceButton.style.pointerEvents = 'auto';
             enemyDiceButton.style.pointerEvents = 'auto';
             let currentNum = await rollDice();
-            let currentDamage2 = (currentNum * 10) + addDamage;
             buttonAble(0);
             playerDiceButton.style.pointerEvents = 'none';
             enemyDiceButton.style.pointerEvents = 'none';
             await log("ダイスの出目: " + currentNum);
-            let currentDamage2_1 = await filterDamage(currentDamage2, target);
-            if (currentDamage2_1 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage2_1;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage2_1 + 'ダメージ！');
-                kintokiDamage(currentDamage2_1, target);
-            }
+            await applyDamage((currentNum * 10) + addDamage, target);
             break;
         case 3: // 盾で防ぎながらの攻撃
             await log(actor.name + 'の盾で防ぎながらの攻撃！');
-            let currentDamage3 = 20 + addDamage;
-            let currentDamage3_1 = await filterDamage(currentDamage3, target);
-            if (currentDamage3_1 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage3_1;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage3_1 + 'ダメージ！/次の相手ターンに受けるダメージを-20した。');
-                actor.shieldDamage = 20;
-                kintokiDamage(currentDamage3_1, target);
-            } else {
+            let currentDamage3_1 = await applyDamage(20 + addDamage, target, (d) => target.name + 'に' + d + 'ダメージ！/次の相手ターンに受けるダメージを-20した。');
+            if (currentDamage3_1 == 0) {
+                // シールドで完全に軽減された場合も、盾で防御しながらの攻撃なので防御バフ自体は発生する
                 await log(actor.name + 'は次の相手ターンに受ける/ダメージを-20した。');
             }
+            actor.shieldDamage = 20;
             break;
         case 4: // 回復魔法で傷を癒す
             await log(actor.name + 'が回復魔法を発動！');
@@ -1148,14 +1119,7 @@ async function broooockAction(dice, actor, target, isNakamu) {
     switch (dice) {
         case 1: // 重みのある斬撃
             await log(actor.name + 'の重みのある斬撃！');
-            let currentDamage = await filterDamage(50, target);
-            if (currentDamage != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage + 'ダメージ！');
-                kintokiDamage(currentDamage, target);
-            }
+            await applyDamage(50, target);
             break;
         case 2: // 空振り
             await log(actor.name + 'は空振りした！');
@@ -1177,14 +1141,7 @@ async function broooockAction(dice, actor, target, isNakamu) {
             if (currentNum % 2 == 0) {
                 await log('偶数だったため、何も起こらなかった。');
             } else {
-                let currentDamage3 = await filterDamage(80, target);
-                if (currentDamage3 != 0) {
-                    await damageEffect(target);
-                    target.hp -= currentDamage3;
-                    displayHPandSP();
-                    await log(target.name + 'に' + currentDamage3 + 'ダメージ！');
-                    kintokiDamage(currentDamage3, target);
-                }
+                await applyDamage(80, target);
             }
             break;
         case 4: // 防御態勢
@@ -1194,18 +1151,11 @@ async function broooockAction(dice, actor, target, isNakamu) {
             break;
         case 5: // 捨て身の攻撃
             await log(actor.name + 'の捨て身の攻撃！');
-            actor.hp -= 20;
+            actor.hp = Math.max(0, actor.hp - 20);
             await damageEffect(actor);
             displayHPandSP();
             await log(actor.name + 'は20ダメージを受けた。');
-            let currentDamage5 = await filterDamage(70, target);
-            if (currentDamage5 != 0) {
-                target.hp -= currentDamage5;
-                await damageEffect(target);
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage5 + 'ダメージ！');
-                kintokiDamage(currentDamage5, target);
-            }
+            await applyDamage(70, target);
             break;
         case 6: // 宿屋で睡眠
             if (isNakamu) {
@@ -1240,25 +1190,11 @@ async function sharkenAction(dice, actor, target, isNakamu) {
     switch (dice) {
         case 1: // ナイフで敵を切り裂く
             await log(actor.name + 'はナイフで敵を切り裂いた！');
-            let currentDamage = await filterDamage(40, target);
-            if (currentDamage != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage + 'ダメージ！');
-                kintokiDamage(currentDamage, target);
-            }
+            await applyDamage(40, target);
             break;
         case 2: // 急所を狙った攻撃
             await log(actor.name + 'の急所を狙った攻撃！');
-            let currentDamage2 = await filterDamage(20, target);
-            if (currentDamage2 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage2;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage2 + 'ダメージ！');
-                kintokiDamage(currentDamage2, target);
-            }
+            await applyDamage(20, target);
             await log('サイコロを振り偶数が出れば40ダメージ！/ダイスを回してください。', true);
             playerDiceButton.innerText = "回す";
             enemyDiceButton.innerText = "回す";
@@ -1277,41 +1213,21 @@ async function sharkenAction(dice, actor, target, isNakamu) {
             if (currentNum % 2 == 1) {
                 await log('奇数だったため、何も起こらなかった。');
             } else {
-                let currentDamage2_1 = await filterDamage(40, target);
-                if (currentDamage2_1 != 0) {
-                    await damageEffect(target);
-                    target.hp -= currentDamage2_1;
-                    displayHPandSP();
-                    await log(target.name + 'に' + currentDamage2_1 + 'ダメージ！');
-                    kintokiDamage(currentDamage2_1, target);
-                }
+                await applyDamage(40, target);
             }
             break;
         case 3: // すれ違いざまの一撃
             await log(actor.name + 'のすれ違いざまの一撃！');
-            let currentDamage3 = await filterDamage(30, target);
-            if (currentDamage3 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage3;
-                
-                displayHPandSP();
-                if (isNakamu) {
-                    await log(target.name + 'に' + currentDamage3 + 'ダメージ！');
-                    await log('シャークんは奪ったお金をNakamuにあげた。/Nakamuのお金が3増えた！');
-                    nakamuCoins += 3;
-                } else {
-                    await log(target.name + 'に' + currentDamage3 + 'ダメージ！/お金が3増えた。');
-                    actor.spValue += 3;
-                }
-                kintokiDamage(currentDamage3, target);
+            if (isNakamu) {
+                await applyDamage(30, target);
+                await log('シャークんは奪ったお金をNakamuにあげた。/Nakamuのお金が3増えた！');
+                nakamuCoins += 3;
             } else {
-                if (isNakamu) {
-                    await log('シャークんは奪ったお金をNakamuにあげた。/Nakamuのお金が3増えた！');
-                    nakamuCoins += 3;
-                } else {
+                const currentDamage3 = await applyDamage(30, target, (d) => target.name + 'に' + d + 'ダメージ！/お金が3増えた。');
+                if (currentDamage3 == 0) {
                     await log(actor.name + 'のお金が3増えた。');
-                    actor.spValue += 3;
                 }
+                actor.spValue += 3;
             }
             break;
         case 4: // 雲隠れ
@@ -1334,23 +1250,9 @@ async function sharkenAction(dice, actor, target, isNakamu) {
             await log(actor.name + 'は高級な武器を購入し、/それを使って攻撃した！');
             await log('お金×10ダメージ！');
             if (isNakamu) {
-                let currentDamage5 = await filterDamage(nakamuCoins * 10, target);
-                if (currentDamage5 != 0) {
-                    await damageEffect(target);
-                    target.hp -= currentDamage5;
-                    displayHPandSP();
-                    await log(target.name + 'に' + currentDamage5 + 'ダメージ！');
-                    kintokiDamage(currentDamage5, target);
-                }
+                await applyDamage(nakamuCoins * 10, target);
             } else {
-                let currentDamage5 = await filterDamage(actor.spValue * 10, target);
-                if (currentDamage5 != 0) {
-                    await damageEffect(target);
-                    target.hp -= currentDamage5;
-                    displayHPandSP();
-                    await log(target.name + 'に' + currentDamage5 + 'ダメージ！');
-                    kintokiDamage(currentDamage5, target);
-                }
+                await applyDamage(actor.spValue * 10, target);
             }
             break;
         case 6: // イカサマ
@@ -1365,23 +1267,11 @@ async function kintokiAction(dice, actor, target, isNakamu) {
     switch (dice) {
         case 1: // 正拳突き
             await log(actor.name + 'の正拳突き！');
-            let currentDamage = await filterDamage(50, target);
-            if (currentDamage != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage + 'ダメージ！');
-            }
+            await applyDamage(50, target);
             break;
         case 2: // マッハパンチ
             await log(actor.name + 'はマッハパンチを繰り出した！');
-            let currentDamage2 = await filterDamage(20, target);
-            if (currentDamage2 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage2;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage2 + 'ダメージ！');
-            }
+            await applyDamage(20, target);
             if (target.hp > 0) {
                 await log(actor.name + 'はもう一度/ターンを行うことができる！');
                 kintokiMoreTurn = true;
@@ -1394,38 +1284,20 @@ async function kintokiAction(dice, actor, target, isNakamu) {
                 if (nakamuBeforeDamage == 0) {
                     await log('しかし、Nakamuは/攻撃を与えられていなかった！');
                 } else {
-                    let currentDamage3 = await filterDamage(nakamuBeforeDamage * 2, target);
-                    if (currentDamage3 != 0) {
-                        await damageEffect(target);
-                        target.hp -= currentDamage3;
-                        displayHPandSP();
-                        await log(target.name + 'に' + currentDamage3 + 'ダメージ！');
-                    }
+                    await applyDamage(nakamuBeforeDamage * 2, target);
                 }
             } else {
                 if (actor.spValue == 0) {
                     await log('しかし、きんときは/攻撃を与えられていなかった！');
                 } else {
-                    console.log(actor.spValue);
-                    let currentDamage3 = await filterDamage(actor.spValue * 2, target);
-                    console.log(currentDamage3);
-                    if (currentDamage3 != 0) {
-                        await damageEffect(target);
-                        target.hp -= currentDamage3;
-                        displayHPandSP();
-                        await log(target.name + 'に' + currentDamage3 + 'ダメージ！');
-                    }
+                    await applyDamage(actor.spValue * 2, target);
                 }
             }
             break;
         case 4: // 痛み分け
             await log(actor.name + 'の痛み分け！');
-            if(actor.hp < target.hp) {
-                let currentDamage4 = target.hp - actor.hp;
-                await damageEffect(target);
-                target.hp -= currentDamage4;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage4 + 'ダメージ！');
+            if (actor.hp < target.hp) {
+                await applyDamage(target.hp - actor.hp, target);
             } else {
                 if (actor.hp == target.hp) {
                     await log('HPが同じだったため、/何も起こらなかった。');
@@ -1437,13 +1309,7 @@ async function kintokiAction(dice, actor, target, isNakamu) {
         case 5: // 決死の一撃
             await log(actor.name + 'の決死の一撃！');
             if (actor.hp <= 30) {
-                let currentDamage5 = await filterDamage(100, target);
-            if (currentDamage5 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage5;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage5 + 'ダメージ！');
-            }
+                await applyDamage(100, target);
             } else {
                 await log('しかし、何も起こらなかった。');
             }
@@ -1460,25 +1326,11 @@ async function smileAction(dice, actor, target, isNakamu) {
     switch (dice) {
         case 1: // 闇の魔術
             await log(actor.name + 'は闇の魔術を詠唱した！');
-            let currentDamage = await filterDamage(50, target);
-            if (currentDamage != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage + 'ダメージ！');
-                kintokiDamage(currentDamage, target);
-            }
+            await applyDamage(50, target);
             break;
         case 2: // 凍てつく大地
             await log(actor.name + 'の凍てつく大地！');
-            let currentDamage2 = await filterDamage(40, target);
-            if (currentDamage2 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage2;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage2 + 'ダメージ！');
-                kintokiDamage(currentDamage2, target);
-            }
+            await applyDamage(40, target);
             await log('サイコロを振り4以上なら/次のターン相手は行動できない！');
             playerDiceButton.innerText = "回す";
             enemyDiceButton.innerText = "回す";
@@ -1503,15 +1355,8 @@ async function smileAction(dice, actor, target, isNakamu) {
             }
             break;
         case 3: // 生命力吸収
-        await log(actor.name + 'はドレイン魔法を放った！');
-            let currentDamage3 = await filterDamage(30, target);
-            if (currentDamage3 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage3;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage3 + 'ダメージ！');
-                kintokiDamage(currentDamage3, target);
-            }
+            await log(actor.name + 'はドレイン魔法を放った！');
+            await applyDamage(30, target);
             let smileMaxHp = isNakamu ? CHARACTERS['Nakamu'].maxHp : CHARACTERS[actor.name].maxHp;
             if (actor.hp == smileMaxHp) {
                 await log('スマイルはこれ以上回復できない！');
@@ -1540,24 +1385,14 @@ async function smileAction(dice, actor, target, isNakamu) {
             } else {
                 await log('魔力×20のダメージ！');
                 if (isNakamu) {
-                    let currentDamage5 = await filterDamage(nakamuMP * 20, target);
+                    const currentDamage5 = await applyDamage(nakamuMP * 20, target);
                     if (currentDamage5 != 0) {
-                        await damageEffect(target);
-                        target.hp -= currentDamage5;
-                        displayHPandSP();
-                        await log(target.name + 'に' + currentDamage5 + 'ダメージ！');
-                        kintokiDamage(currentDamage5, target);
                         await log('スマイルの魔力が0になった。');
                     }
                     nakamuMP = 0;
                 } else {
-                    let currentDamage5 = await filterDamage(actor.spValue * 20, target);
+                    const currentDamage5 = await applyDamage(actor.spValue * 20, target);
                     if (currentDamage5 != 0) {
-                        await damageEffect(target);
-                        target.hp -= currentDamage5;
-                        displayHPandSP();
-                        await log(target.name + 'に' + currentDamage5 + 'ダメージ！');
-                        kintokiDamage(currentDamage5, target);
                         await log('スマイルの魔力が0になった。');
                     }
                     actor.spValue = 0;
@@ -1576,25 +1411,11 @@ async function kiriyanAction(dice, actor, target) {
     switch (dice) {
         case 1: // 鋭い爪で薙ぎ払う
             await log(actor.name + 'は鋭い爪で薙ぎ払った！');
-            let currentDamage = await filterDamage(60, target);
-            if (currentDamage != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage + 'ダメージ！');
-                kintokiDamage(currentDamage, target);
-            }
+            await applyDamage(60, target);
             break;
         case 2: // 火炎ブレス
             await log(actor.name + 'は激しい炎を吐き出した！');
-            let currentDamage2 = await filterDamage(30, target);
-            if (currentDamage2 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage2;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage2 + 'ダメージ！');
-                kintokiDamage(currentDamage2, target);
-            }
+            await applyDamage(30, target);
             if (isKiriyan2) {
                 await log(target.name + 'はすでに火傷を負っている！');
             } else {
@@ -1605,14 +1426,7 @@ async function kiriyanAction(dice, actor, target) {
             break;
         case 3: // 魔王の眼光
             await log(actor.name + 'の魔王の眼光！');
-            let currentDamage3 = await filterDamage(10, target);
-            if (currentDamage3 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage3;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage3 + 'ダメージ！');
-                kintokiDamage(currentDamage3, target);
-            }
+            await applyDamage(10, target);
             if (actor.turn == '後攻') {
                 actor.turn = '先攻';
                 target.turn = '後攻';
@@ -1645,15 +1459,8 @@ async function kiriyanAction(dice, actor, target) {
             }
             break;
         case 5: // 天変地異を引き起こす
-        await log(actor.name + 'は天変地異を引き起こした！');
-            let currentDamage5 = await filterDamage(50, target);
-            if (currentDamage5 != 0) {
-                await damageEffect(target);
-                target.hp -= currentDamage5;
-                displayHPandSP();
-                await log(target.name + 'に' + currentDamage5 + 'ダメージ！');
-                kintokiDamage(currentDamage5, target);
-            }
+            await log(actor.name + 'は天変地異を引き起こした！');
+            await applyDamage(50, target);
             await log(target.name + 'の次ターンの出目が裏返される！');
             isKiriyan5 = true;
             break;
@@ -1758,6 +1565,24 @@ async function kintokiDamage(damage, target) {
     } else if (target.name == 'Nakamu') {
         nakamuBeforeDamage = damage;
     }
+}
+
+// filterDamage(シールド軽減・無敵判定) → 被弾演出 → HP減算(0未満にならないようクランプ) → 表示更新 → ログ → kintokiDamage記録
+// をまとめて行う共通処理。各キャラクターのダメージ技はすべてこれを経由させる。
+// rawDamage: シールド軽減前の生ダメージ　target: ダメージを受ける側
+// messageFn: ダメージが実際に発生した場合のログ文言を生成する関数 (damage) => string　省略時は標準文言
+// 戻り値: 実際に与えたダメージ(シールド等で無効化された場合は0)
+async function applyDamage(rawDamage, target, messageFn) {
+    const damage = await filterDamage(rawDamage, target);
+    if (damage != 0) {
+        await damageEffect(target);
+        target.hp = Math.max(0, target.hp - damage);
+        displayHPandSP();
+        const message = messageFn ? messageFn(damage) : (target.name + 'に' + damage + 'ダメージ！');
+        await log(message);
+        kintokiDamage(damage, target);
+    }
+    return damage;
 }
 
 async function nakamu5Action(guest, actor, target) {

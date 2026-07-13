@@ -36,13 +36,14 @@
 - [x] **キャラクターデータテーブル化**：`CHARACTERS` オブジェクトを新設し、`setChara()` の並行switch文をルックアップに置き換える。最大HPもここに集約し、`actor.hp == 170` 等のマジックナンバー比較を置き換える（→④の根本解消、マジックナンバー散在の解消）
   - [x] 置き換え中に新規バグ⑮を発見・修正（Nakamu召喚時のシャークん/スマイルの回復がHPを削ってしまう問題。詳細はBUGS.md参照）
 - [x] **状態リセットの統一**：`resetBattleState()` を新設し、`player`/`enemy` の `shieldDamage`/`turnSkip`/`invincible`/`marunomi` と `nakamuBeforeDamage` をまとめてリセット。`replay()`/`returnTop()` の両方から呼ぶ（→⑪の根本解消）
-- [ ] **共通ダメージ関数の導入**：`applyDamage(rawDamage, target)` を新設（`filterDamage()`→`damageEffect()`→HP減算(0クランプ込み)→`displayHPandSP()`→ログ→`kintokiDamage()`）。各キャラクターの `...Action()` 内の同型処理を置き換える（→⑤⑥⑭の根本解消）。1キャラクターずつ置き換えて都度動作確認する
-  - [ ] Nakamu (`nakamuAction`)
-  - [ ] Broooock (`broooockAction`)
-  - [ ] シャークん (`sharkenAction`)
-  - [ ] きんとき (`kintokiAction`)
-  - [ ] スマイル (`smileAction`)
-  - [ ] きりやん (`kiriyanAction`)
+- [x] **共通ダメージ関数の導入**：`applyDamage(rawDamage, target)` を新設（`filterDamage()`→`damageEffect()`→HP減算(0クランプ込み)→`displayHPandSP()`→ログ→`kintokiDamage()`）。各キャラクターの `...Action()` 内の同型処理を置き換える(→⑤⑥⑭の根本解消)。1キャラクターずつ置き換えて都度確認した
+  - [x] Nakamu (`nakamuAction`) — 置き換え中に新規バグ⑯を発見・修正(盾で防ぎながらの攻撃がブロックされると防御バフが発動しない)
+  - [x] Broooock (`broooockAction`)
+  - [x] シャークん (`sharkenAction`)
+  - [x] きんとき (`kintokiAction`) — ⑤⑥はここで根本解消
+  - [x] スマイル (`smileAction`)
+  - [x] きりやん (`kiriyanAction`) — 「丸飲み」の即死ダメージのみ意図的にfilterDamage非経由のまま維持(フェーズ3で扱う⑦とは別論点。仕様上「防御無視の即死技」として設計されている可能性があるため、挙動を変えずに現状維持。ユーザー確認が必要なら別途相談)
+  - [x] 副産物：`turnStartEnemy()` のきりやん火傷ダメージ処理で新規バグ⑰を発見・修正(filterDamageの対象がotherActor(きりやん側)になっており、本来火傷を受けた本人の防御状態を見るべきところが間違っていた)
 
 ## フェーズ3：基盤整備後に対応する残りのバグ
 

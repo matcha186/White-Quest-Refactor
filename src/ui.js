@@ -175,6 +175,22 @@ export function damageEffect(target) {
     gameContainer.addEventListener('animationend', finishShake);
 }
 
+export function showDamagePopup(target, damage) {
+    const gameDisplay = document.getElementById('game-display');
+    const popup = document.createElement('span');
+    const sideClass = target.playerNum === 1
+        ? 'damage-popup-player'
+        : 'damage-popup-enemy';
+
+    popup.classList.add('damage-popup', sideClass);
+    popup.textContent = `-${damage}`;
+    gameDisplay.appendChild(popup);
+
+    const removePopup = () => popup.remove();
+    popup.addEventListener('animationend', removePopup, { once: true });
+    setTimeout(removePopup, 1100);
+}
+
 export function healEffect(actor) {
     const actorHPText = (actor === state.player) ? playerHPText : enemyHPText;
 

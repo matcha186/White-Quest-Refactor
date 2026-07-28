@@ -4,6 +4,7 @@ import {
     log,
     attackEffect,
     damageEffect,
+    showDamagePopup,
     healEffect,
     displayHPandSP,
     toggleCloudEffect,
@@ -240,7 +241,8 @@ export async function broooockAction(dice, actor, target, isNakamu) {
         case 5: // 捨て身の攻撃
             await log(actor.name + 'の捨て身の攻撃！');
             actor.hp = Math.max(0, actor.hp - 20);
-            await damageEffect(actor);
+            damageEffect(actor);
+            showDamagePopup(actor, 20);
             displayHPandSP();
             await log(actor.name + 'は20ダメージを受けた。');
             await applyDamage(70, target);
@@ -563,6 +565,7 @@ export async function kiriyanAction(dice, actor, target) {
                 let currentDamage6 = target.hp;
                 await attackEffect(target);
                 damageEffect(target);
+                showDamagePopup(target, currentDamage6);
                 target.hp -= currentDamage6;
                 displayHPandSP();
                 await log(target.name + 'のHPが0になった。');
@@ -616,6 +619,7 @@ export async function applyDamage(rawDamage, target, messageFn, options = {}) {
     const damage = await filterDamage(rawDamage, target);
     if (damage !== 0) {
         damageEffect(target);
+        showDamagePopup(target, damage);
         target.hp = Math.max(0, target.hp - damage);
         displayHPandSP();
         const message = messageFn ? messageFn(damage) : (target.name + 'に' + damage + 'ダメージ！');

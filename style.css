@@ -167,6 +167,39 @@ button {
     flex-flow: column;
 }
 
+@keyframes lunge-right {
+    30% {
+        transform: translateX(30px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes lunge-left {
+    30% {
+        transform: translateX(-30px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.attack-right {
+    animation: lunge-right 0.35s ease-out;
+}
+
+.attack-left {
+    animation: lunge-left 0.35s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .attack-right,
+    .attack-left {
+        animation: none;
+    }
+}
+
 #player-card {
     width: 250px;
     height: 155px;

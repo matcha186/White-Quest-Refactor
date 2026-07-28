@@ -2,6 +2,7 @@ import { state, CHARACTERS } from './state.js';
 import {
     elements,
     log,
+    attackEffect,
     damageEffect,
     healEffect,
     displayHPandSP,
@@ -560,7 +561,8 @@ export async function kiriyanAction(dice, actor, target) {
             } else {
                 await log(actor.name + 'は' + target.name + 'を丸飲みした！');
                 let currentDamage6 = target.hp;
-                await damageEffect(target);
+                await attackEffect(target);
+                damageEffect(target);
                 target.hp -= currentDamage6;
                 displayHPandSP();
                 await log(target.name + 'のHPが0になった。');
@@ -606,10 +608,14 @@ export async function kintokiDamage(damage, target) {
     }
 }
 
-export async function applyDamage(rawDamage, target, messageFn) {
+export async function applyDamage(rawDamage, target, messageFn, options = {}) {
+    if (options.animateAttack !== false) {
+        await attackEffect(target);
+    }
+
     const damage = await filterDamage(rawDamage, target);
     if (damage !== 0) {
-        await damageEffect(target);
+        damageEffect(target);
         target.hp = Math.max(0, target.hp - damage);
         displayHPandSP();
         const message = messageFn ? messageFn(damage) : (target.name + 'に' + damage + 'ダメージ！');

@@ -397,7 +397,7 @@ async function turnStartEnemy() {
     if (state.isKiriyan2) { // きりやん火傷
         if (currentActor.name !== 'きりやん') {
             await log(currentActor.name + 'は火傷による/継続ダメージを受けた！');
-            await applyDamage(10, currentActor);
+            await applyDamage(10, currentActor, undefined, { animateAttack: false });
         }
     }
 

@@ -40,7 +40,8 @@ export const elements = {
 
 const {
     logText, playerHPText, playerSPText, playerTurnText, enemyHPText, enemySPText,
-    enemyTurnText, playerDiceButton, enemyDiceButton, charaCard, nakamuCharaCard
+    enemyTurnText, playerDiceButton, enemyDiceButton, playerIcon, enemyIcon,
+    charaCard, nakamuCharaCard
 } = elements;
 
 const imageMap = {
@@ -121,10 +122,39 @@ export function logClear() {
     logText.innerHTML = '';
 }
 
+export function attackEffect(target) {
+    const attacker = target === state.player ? state.enemy : state.player;
+    const attackerElement = attacker.playerNum === 1 ? playerIcon : enemyIcon;
+    const animationClass = attacker.playerNum === 1 ? 'attack-right' : 'attack-left';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return Promise.resolve();
+    }
+
+    attackerElement.classList.remove('attack-right', 'attack-left');
+    void attackerElement.offsetWidth;
+    attackerElement.classList.add(animationClass);
+
+    return new Promise((resolve) => {
+        const finish = (event) => {
+            if (event && event.target !== attackerElement) return;
+            attackerElement.removeEventListener('animationend', finish);
+            attackerElement.classList.remove(animationClass);
+            clearTimeout(fallbackTimer);
+            resolve();
+        };
+
+        const fallbackTimer = setTimeout(() => finish(), 450);
+        attackerElement.addEventListener('animationend', finish);
+    });
+}
+
 export function damageEffect(target) {
     const gameContainer = document.getElementById('game-container');
     const targetHPText = (target === state.player) ? playerHPText : enemyHPText;
 
+    gameContainer.classList.remove('shake');
+    void gameContainer.offsetWidth;
     gameContainer.classList.add('shake');
     targetHPText.style.color = 'red';
 
@@ -137,9 +167,12 @@ export function damageEffect(target) {
         targetHPText.style.color = '';
     }, 600);
 
-    gameContainer.addEventListener('animationend', () => {
+    const finishShake = (event) => {
+        if (event.target !== gameContainer) return;
         gameContainer.classList.remove('shake');
-    }, { once: true });
+        gameContainer.removeEventListener('animationend', finishShake);
+    };
+    gameContainer.addEventListener('animationend', finishShake);
 }
 
 export function healEffect(actor) {

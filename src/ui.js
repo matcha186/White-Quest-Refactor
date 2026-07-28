@@ -40,7 +40,8 @@ export const elements = {
 
 const {
     logText, playerHPText, playerSPText, playerTurnText, enemyHPText, enemySPText,
-    enemyTurnText, playerDiceButton, enemyDiceButton, charaCard, nakamuCharaCard
+    enemyTurnText, playerDiceButton, enemyDiceButton, playerIcon, enemyIcon,
+    charaCard, nakamuCharaCard
 } = elements;
 
 const imageMap = {
@@ -121,10 +122,39 @@ export function logClear() {
     logText.innerHTML = '';
 }
 
+export function attackEffect(target) {
+    const attacker = target === state.player ? state.enemy : state.player;
+    const attackerElement = attacker.playerNum === 1 ? playerIcon : enemyIcon;
+    const animationClass = attacker.playerNum === 1 ? 'attack-right' : 'attack-left';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return Promise.resolve();
+    }
+
+    attackerElement.classList.remove('attack-right', 'attack-left');
+    void attackerElement.offsetWidth;
+    attackerElement.classList.add(animationClass);
+
+    return new Promise((resolve) => {
+        const finish = (event) => {
+            if (event && event.target !== attackerElement) return;
+            attackerElement.removeEventListener('animationend', finish);
+            attackerElement.classList.remove(animationClass);
+            clearTimeout(fallbackTimer);
+            resolve();
+        };
+
+        const fallbackTimer = setTimeout(() => finish(), 450);
+        attackerElement.addEventListener('animationend', finish);
+    });
+}
+
 export function damageEffect(target) {
     const gameContainer = document.getElementById('game-container');
     const targetHPText = (target === state.player) ? playerHPText : enemyHPText;
 
+    gameContainer.classList.remove('shake');
+    void gameContainer.offsetWidth;
     gameContainer.classList.add('shake');
     targetHPText.style.color = 'red';
 
@@ -137,9 +167,28 @@ export function damageEffect(target) {
         targetHPText.style.color = '';
     }, 600);
 
-    gameContainer.addEventListener('animationend', () => {
+    const finishShake = (event) => {
+        if (event.target !== gameContainer) return;
         gameContainer.classList.remove('shake');
-    }, { once: true });
+        gameContainer.removeEventListener('animationend', finishShake);
+    };
+    gameContainer.addEventListener('animationend', finishShake);
+}
+
+export function showDamagePopup(target, damage) {
+    const gameDisplay = document.getElementById('game-display');
+    const popup = document.createElement('span');
+    const sideClass = target.playerNum === 1
+        ? 'damage-popup-player'
+        : 'damage-popup-enemy';
+
+    popup.classList.add('damage-popup', sideClass);
+    popup.textContent = `-${damage}`;
+    gameDisplay.appendChild(popup);
+
+    const removePopup = () => popup.remove();
+    popup.addEventListener('animationend', removePopup, { once: true });
+    setTimeout(removePopup, 1100);
 }
 
 export function healEffect(actor) {
@@ -179,9 +228,38 @@ export function preloadImage(src) {
     });
 }
 
+function updateHPDisplay(actor, element) {
+    const maxHp = Math.max(1, actor.maxHp);
+    const percentage = Math.max(0, Math.min(100, (actor.hp / maxHp) * 100));
+    const levelClass = percentage > 50
+        ? 'hp-gauge-high'
+        : percentage > 25
+            ? 'hp-gauge-medium'
+            : 'hp-gauge-low';
+
+    const value = document.createElement('span');
+    value.className = 'hp-value';
+    value.textContent = `HP: ${actor.hp} / ${maxHp}`;
+
+    const gauge = document.createElement('span');
+    gauge.className = 'hp-gauge';
+    gauge.setAttribute('role', 'progressbar');
+    gauge.setAttribute('aria-label', `${actor.name}のHP`);
+    gauge.setAttribute('aria-valuemin', '0');
+    gauge.setAttribute('aria-valuemax', String(maxHp));
+    gauge.setAttribute('aria-valuenow', String(actor.hp));
+
+    const fill = document.createElement('span');
+    fill.classList.add('hp-gauge-fill', levelClass);
+    fill.style.width = `${percentage}%`;
+    gauge.appendChild(fill);
+
+    element.replaceChildren(value, gauge);
+}
+
 export function displayHPandSP() {
-    playerHPText.innerHTML = 'HP: ' + state.player.hp;
-    enemyHPText.innerHTML = 'HP: ' + state.enemy.hp;
+    updateHPDisplay(state.player, playerHPText);
+    updateHPDisplay(state.enemy, enemyHPText);
     playerTurnText.innerHTML = state.player.turn;
     enemyTurnText.innerHTML = state.enemy.turn;
     if (state.player.name === 'Nakamu') {

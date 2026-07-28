@@ -19,7 +19,9 @@ body {
     -khtml-user-select:none;
     -webkit-user-drag:none;
     -khtml-user-drag:none;
-    overflow: hidden;
+    min-width: 1000px;
+    min-height: 700px;
+    overflow: auto;
 }
 
 img {
@@ -30,13 +32,72 @@ button {
     font-family: 'PixelMplus12-Regular', sans-serif;
 }
 
+.choice-button,
+#decide-button,
+#random-button,
+.nakamu5,
+.reroll,
+#turn-decide-button,
+#replay,
+#top {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.choice-button:not(:disabled):hover,
+#decide-button:not(:disabled):hover,
+#random-button:not(:disabled):hover,
+.nakamu5:not(:disabled):hover,
+.reroll:not(:disabled):hover,
+#turn-decide-button:not(:disabled):hover,
+#replay:not(:disabled):hover,
+#top:not(:disabled):hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 14px rgba(255, 255, 255, 0.45);
+}
+
+.choice-button:not(:disabled):active,
+#decide-button:not(:disabled):active,
+#random-button:not(:disabled):active,
+.nakamu5:not(:disabled):active,
+.reroll:not(:disabled):active,
+#replay:not(:disabled):active,
+#top:not(:disabled):active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.choice-button:disabled,
+#decide-button:disabled,
+#random-button:disabled,
+.nakamu5:disabled,
+.reroll:disabled,
+#turn-decide-button:disabled,
+#replay:disabled,
+#top:disabled {
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .choice-button,
+    #decide-button,
+    #random-button,
+    .nakamu5,
+    .reroll,
+    #turn-decide-button,
+    #replay,
+    #top {
+        transition: none;
+    }
+}
+
 #game-container {
     position: relative;
 }
 
 #game-display {
-    width: 720px;
-    height: 540px;
+    width: 960px;
+    height: 640px;
     background-color: #000;
     border: 10px solid #fff;
     border-radius: 50px;
@@ -58,8 +119,8 @@ button {
 }
 
 #log-container {
-    width: 650px;
-    height: 110px;
+    width: 870px;
+    height: 125px;
     background-color: #000;
     border: 8px solid #fff;
     border-radius: 20px;
@@ -67,8 +128,8 @@ button {
     position: absolute;
     left: 0;
     right: 0;
-    top: 350px;
-    bottom : -15px;
+    top: 480px;
+    bottom: auto;
     margin:  auto;
 }
 
@@ -81,8 +142,8 @@ button {
 }
 
 .player-div {
-    height: 520px;
-    width: 360px;
+    height: 620px;
+    width: 480px;
     padding: 10px;
 }
 
@@ -95,8 +156,8 @@ button {
 }
 
 .enemy-div {
-    height: 520px;
-    width: 360px;
+    height: 620px;
+    width: 480px;
     padding: 10px;
 }
 
@@ -108,36 +169,69 @@ button {
     flex-flow: column;
 }
 
+@keyframes lunge-right {
+    30% {
+        transform: translateX(30px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes lunge-left {
+    30% {
+        transform: translateX(-30px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.attack-right {
+    animation: lunge-right 0.35s ease-out;
+}
+
+.attack-left {
+    animation: lunge-left 0.35s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .attack-right,
+    .attack-left {
+        animation: none;
+    }
+}
+
 #player-card {
-    width: 250px;
-    height: 155px;
+    width: 300px;
+    height: auto;
     position: absolute;
-    left: 100px;
-    top: 225px;
+    left: 170px;
+    top: 280px;
 }
 
 #enemy-card {
-    width: 250px;
-    height: 155px;
+    width: 300px;
+    height: auto;
     position: absolute;
-    right: 100px;
-    top: 225px;
+    right: 170px;
+    top: 280px;
 }
 
 .icon {
     position: absolute;
-    width: 200px;
-    height: 124px;
-    top: 101px;
+    width: 220px;
+    height: auto;
+    top: 115px;
 }
 
 #player-icon {
-    left: 150px;
+    left: 240px;
     opacity: 1;
 }
 
 #enemy-icon {
-    right: 150px;
+    right: 240px;
     opacity: 1;
 }
 
@@ -152,8 +246,51 @@ button {
 }
 
 .hp {
-    font-size: 30px;
-    line-height: 40px;
+    display: inline-flex;
+    width: 190px;
+    flex-direction: column;
+    gap: 3px;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+#enemy-hp {
+    align-items: flex-end;
+}
+
+.hp-value {
+    font-size: 24px;
+    white-space: nowrap;
+}
+
+.hp-gauge {
+    display: block;
+    width: 180px;
+    height: 14px;
+    overflow: hidden;
+    background-color: #282828;
+    border: 2px solid #fff;
+    border-radius: 9px;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+.hp-gauge-fill {
+    display: block;
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.35s ease, background-color 0.35s ease;
+}
+
+.hp-gauge-high {
+    background-color: #22c55e;
+}
+
+.hp-gauge-medium {
+    background-color: #facc15;
+}
+
+.hp-gauge-low {
+    background-color: #ef4444;
 }
 
 .sp {
@@ -171,8 +308,8 @@ button {
 } */
 
 #choice-display {
-    width: 720px;
-    height: 540px;
+    width: 960px;
+    height: 640px;
     background-color: #000;
     border: 10px solid #fff;
     border-radius: 50px;
@@ -182,8 +319,8 @@ button {
 }
 
 #choice-left-div {
-    width: 360px;
-    height: 390px;
+    width: 480px;
+    height: 480px;
     /* background-color: aqua; */
     display: flex;
     justify-content: center;
@@ -195,8 +332,8 @@ button {
     position: absolute;
     top: 0px;
     right: 0px;
-    width: 360px;
-    height: 390px;
+    width: 480px;
+    height: 480px;
     /* background-color: pink; */
     display: flex;
     justify-content: center;
@@ -232,7 +369,7 @@ button {
 }
 
 #choice-card {
-    width: 250px;
+    width: 300px;
     height: auto;
     display: none;
     /* image-rendering: pixelated; */
@@ -361,7 +498,9 @@ button {
     position: absolute;
     width: 75px;
     height: auto;
-    margin-top: 50px;
+    left: 35px;
+    top: 330px;
+    margin: 0;
     opacity: 1;
     transition: opacity 0.5s ease;
 }
@@ -371,10 +510,12 @@ button {
 }
 
 #enemy-dice {
+    position: absolute;
     width: 75px;
     height: auto;
-    margin-left: auto;
-    margin-top: 50px;
+    right: 35px;
+    top: 330px;
+    margin: 0;
     opacity: 1;
     transition: opacity 0.5s ease;
 }
@@ -385,14 +526,17 @@ button {
 
 #player-dice-button {
     position: absolute;
-    margin-top: 135px;
+    left: 35px;
+    top: 420px;
+    margin: 0;
 }
 
 #enemy-dice-button{
     position: absolute;
-    bottom: 160px;
-    margin: 10px;
-    right: 0;
+    right: 35px;
+    top: 420px;
+    bottom: auto;
+    margin: 0;
 }
 
 .dice-button {
@@ -473,6 +617,55 @@ button {
   
 .damage-fade {
 animation: damage 0.5s ease-in-out forwards;
+}
+
+@keyframes damage-popup {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 8px) scale(0.8);
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1.15);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -55px) scale(1);
+    }
+}
+
+.damage-popup {
+    position: absolute;
+    top: 125px;
+    z-index: 60;
+    color: #ff3b30;
+    font-size: 38px;
+    font-weight: bold;
+    line-height: 1;
+    pointer-events: none;
+    text-shadow:
+        -2px -2px 0 #fff,
+        2px -2px 0 #fff,
+        -2px 2px 0 #fff,
+        2px 2px 0 #fff,
+        0 4px 8px rgba(0, 0, 0, 0.8);
+    animation: damage-popup 0.9s ease-out forwards;
+}
+
+.damage-popup-player {
+    left: 350px;
+}
+
+.damage-popup-enemy {
+    left: 610px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .damage-popup {
+        opacity: 1;
+        transform: translateX(-50%);
+        animation: none;
+    }
 }
 
 @keyframes heal {
@@ -608,8 +801,8 @@ animation: heal 0.5s ease-in-out forwards;
 #player-effect {
     display: none; /* 初期状態では非表示 */
     position: absolute;
-    top: 111px;
-    left: 159px;
+    top: 125px;
+    left: 250px;
     width: 200px;
     height: 124px;
     pointer-events: none;
@@ -618,8 +811,8 @@ animation: heal 0.5s ease-in-out forwards;
 #enemy-effect {
     display: none; /* 初期状態では非表示 */
     position: absolute;
-    top: 111px;
-    left: 380px;
+    top: 125px;
+    left: 510px;
     width: 100%;
     height: 100%;
     pointer-events: none;

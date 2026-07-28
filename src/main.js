@@ -397,7 +397,7 @@ async function turnStartEnemy() {
     if (state.isKiriyan2) { // きりやん火傷
         if (currentActor.name !== 'きりやん') {
             await log(currentActor.name + 'は火傷による/継続ダメージを受けた！');
-            await applyDamage(10, currentActor);
+            await applyDamage(10, currentActor, undefined, { animateAttack: false });
         }
     }
 
@@ -463,22 +463,9 @@ async function setChara() {
 
     playerJobText.innerHTML = state.player.job;
     playerNameText.innerHTML = state.player.name;
-    playerHPText.innerHTML = 'HP: ' + state.player.hp;
-    if (state.player.name === 'Nakamu') {
-        playerSPText.innerHTML = state.player.spName + state.player.spValue + '(+' + ((state.nakamuLevel - 1) * 10) + ')';
-    } else {
-        playerSPText.innerHTML = state.player.spName + state.player.spValue;
-    }
     enemyJobText.innerHTML = state.enemy.job;
     enemyNameText.innerHTML = state.enemy.name;
-    enemyHPText.innerHTML = 'HP: ' + state.enemy.hp;
-    if (state.enemy.name === 'Nakamu') {
-        enemySPText.innerHTML = state.enemy.spName + state.enemy.spValue + '(+' + ((state.nakamuLevel - 1) * 10) + ')';
-    } else {
-        enemySPText.innerHTML = state.enemy.spName + state.enemy.spValue;
-    }
-    playerTurnText.innerHTML = state.player.turn;
-    enemyTurnText.innerHTML = state.enemy.turn;
+    displayHPandSP();
 
     playerCard.src = state.player.img;
     enemyCard.src = state.enemy.img;

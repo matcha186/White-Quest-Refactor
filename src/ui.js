@@ -228,9 +228,38 @@ export function preloadImage(src) {
     });
 }
 
+function updateHPDisplay(actor, element) {
+    const maxHp = Math.max(1, actor.maxHp);
+    const percentage = Math.max(0, Math.min(100, (actor.hp / maxHp) * 100));
+    const levelClass = percentage > 50
+        ? 'hp-gauge-high'
+        : percentage > 25
+            ? 'hp-gauge-medium'
+            : 'hp-gauge-low';
+
+    const value = document.createElement('span');
+    value.className = 'hp-value';
+    value.textContent = `HP: ${actor.hp} / ${maxHp}`;
+
+    const gauge = document.createElement('span');
+    gauge.className = 'hp-gauge';
+    gauge.setAttribute('role', 'progressbar');
+    gauge.setAttribute('aria-label', `${actor.name}のHP`);
+    gauge.setAttribute('aria-valuemin', '0');
+    gauge.setAttribute('aria-valuemax', String(maxHp));
+    gauge.setAttribute('aria-valuenow', String(actor.hp));
+
+    const fill = document.createElement('span');
+    fill.classList.add('hp-gauge-fill', levelClass);
+    fill.style.width = `${percentage}%`;
+    gauge.appendChild(fill);
+
+    element.replaceChildren(value, gauge);
+}
+
 export function displayHPandSP() {
-    playerHPText.innerHTML = 'HP: ' + state.player.hp;
-    enemyHPText.innerHTML = 'HP: ' + state.enemy.hp;
+    updateHPDisplay(state.player, playerHPText);
+    updateHPDisplay(state.enemy, enemyHPText);
     playerTurnText.innerHTML = state.player.turn;
     enemyTurnText.innerHTML = state.enemy.turn;
     if (state.player.name === 'Nakamu') {

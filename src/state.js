@@ -39,6 +39,7 @@ const createActor = (playerNum) => ({
     job: '',
     name: '',
     hp: 0,
+    maxHp: 0,
     spName: '',
     spValue: 0,
     turn: '',

@@ -45,6 +45,7 @@ export function applyCharacterData(actor) {
     const data = CHARACTERS[actor.name];
     actor.job = data.job;
     actor.hp = data.maxHp;
+    actor.maxHp = data.maxHp;
     actor.spName = data.spName;
     actor.spValue = initialSpValue(actor.name);
     actor.img = data.img;

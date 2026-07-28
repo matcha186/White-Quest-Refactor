@@ -30,6 +30,65 @@ button {
     font-family: 'PixelMplus12-Regular', sans-serif;
 }
 
+.choice-button,
+#decide-button,
+#random-button,
+.nakamu5,
+.reroll,
+#turn-decide-button,
+#replay,
+#top {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.choice-button:not(:disabled):hover,
+#decide-button:not(:disabled):hover,
+#random-button:not(:disabled):hover,
+.nakamu5:not(:disabled):hover,
+.reroll:not(:disabled):hover,
+#turn-decide-button:not(:disabled):hover,
+#replay:not(:disabled):hover,
+#top:not(:disabled):hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 14px rgba(255, 255, 255, 0.45);
+}
+
+.choice-button:not(:disabled):active,
+#decide-button:not(:disabled):active,
+#random-button:not(:disabled):active,
+.nakamu5:not(:disabled):active,
+.reroll:not(:disabled):active,
+#replay:not(:disabled):active,
+#top:not(:disabled):active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.choice-button:disabled,
+#decide-button:disabled,
+#random-button:disabled,
+.nakamu5:disabled,
+.reroll:disabled,
+#turn-decide-button:disabled,
+#replay:disabled,
+#top:disabled {
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .choice-button,
+    #decide-button,
+    #random-button,
+    .nakamu5,
+    .reroll,
+    #turn-decide-button,
+    #replay,
+    #top {
+        transition: none;
+    }
+}
+
 #game-container {
     position: relative;
 }

@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>White Quest</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="icon.ico">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/icon.ico">
 </head>
 <body>
     <div id="debug">
-        <!-- <button id="damage" onclick="damageEffect()">揺らす</button> -->
         <div id="debug-container1">
             <div>
                 <label for="player-dice-select">プレイヤーのダイス目設定:</label>
@@ -47,8 +46,6 @@
         </div>
 
         <div id="debug-container2">
-            <!-- <button onclick="fadeOutDice()">ダイス消える</button>
-            <button onclick="fadeInDice()">ダイス現る</button> -->
         </div>
     </div>
     
@@ -59,7 +56,7 @@
         <div id="choice-display">
             <div id="choice-left-div">
                 <div id="random-button-contains">
-                    <button id="random-button" onclick="randomButtonEnter()">ランダム</button>
+                    <button id="random-button">ランダム</button>
                 </div>
                 <div id="choice-button-contains">
                     <button id="hero-choice" class="choice-button">勇者</button>
@@ -73,7 +70,7 @@
                     <button id="decide-button">決定</button>
                 </div>
                 <div id="turn-decide">先攻 → 
-                    <button id="turn-decide-button" onclick="decideTurn()">1P</button>
+                    <button id="turn-decide-button">1P</button>
                 </div>
                 
             </div>
@@ -132,8 +129,8 @@
                 <button id="smile" class="nakamu5">賢者</br>スマイル</button>
             </div>
             <div id="replay-dialog">
-                <button id="replay" onclick="replay()">同じキャラでリプレイ</button>
-                <button id="top" onclick="returnTop()">キャラ選択に戻る</button>
+                <button id="replay">同じキャラでリプレイ</button>
+                <button id="top">キャラ選択に戻る</button>
             </div>
         </div>
         <p id="game-rule">※体力は上限以上に回復しないよ！</p>
@@ -144,6 +141,6 @@
             <div class="cloud"></div>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script type="module" src="/src/main.js"></script>
 </body>
 </html>

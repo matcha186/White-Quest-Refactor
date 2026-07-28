@@ -30,18 +30,18 @@
 
 土台となるフェーズ。他の全フェーズはこの上に積む前提。
 
-- [ ] `package.json` / `vite.config.js` を新規作成（`npm create vite`のスキャフォールドは既存ファイルと衝突するため手動セットアップ）
-- [ ] `.gitignore` に `node_modules/` / `dist/` を追加
-- [ ] `img/`, `fonts/`, `icon.ico` を Viteの `public/` 配下に移動（同じ相対パスのまま配信されるので、画像パス文字列の書き換え不要）
-- [ ] `script.js`（2000行超）を `src/` 配下に機能別分割する
-  - [ ] `src/state.js` — `player`/`enemy`オブジェクト、`CHARACTERS`テーブル、`choiceLog`/`battleLog`/`charaNumArray`、全ての可変`let`フラグ群
-  - [ ] `src/characters.js` — 6キャラ分の`...Action()`関数、`applyCharacterData`/`initialSpValue`、`nakamu5Action`、`actions`マップ、`filterDamage`/`applyDamage`/`kintokiDamage`
-  - [ ] `src/dice.js` — `rollDice()`、`rollDiceLogic`、`onPlayerDiceClick`/`onEnemyDiceClick`、`diceRollState`、`promptReroll`
-  - [ ] `src/ui.js` — `log()`/`logClear()`、`displayHPandSP()`、`damageEffect()`/`healEffect()`、`toggleCloudEffect()`、`fadeOutDice`/`fadeInDice`、`updateCardDisplay`系、`buttonAble`、`preloadImages`
-  - [ ] `src/main.js` — `game()`/`choice()`/`decideName()`/`turnStartEnemy()`/`skipBroKiri()`/`enemyBattle()`/`npcBattle()`/`setChara()`/`resetBattleState()`/`replay()`/`returnTop()`/`randomDecide()`/`randomButtonEnter()`/`decideTurn()`、トップレベルのイベントリスナー登録一式（Viteのエントリポイント）
-- [ ] `index.html` の `<script src="script.js">` を `<script type="module" src="/src/main.js">` に変更
-- [ ] `index.html` に残る4つのinline `onclick`属性（`random-button`/`turn-decide-button`/`replay`/`top`）を`addEventListener`方式に置き換え、inline onclickを全廃する（ESモジュールはトップレベル関数を自動でグローバル化しないため）
-- [ ] `npm install` → `npm run dev` で起動確認
+- [x] `package.json` / `vite.config.js` を新規作成（`npm create vite`のスキャフォールドは既存ファイルと衝突するため手動セットアップ）
+- [x] `.gitignore` に `node_modules/` / `dist/` を追加
+- [x] `img/`, `fonts/`, `icon.ico` を Viteの `public/` 配下に移動（同じ相対パスのまま配信されるので、画像パス文字列の書き換え不要）
+- [x] `script.js`（2000行超）を `src/` 配下に機能別分割する
+  - [x] `src/state.js` — `player`/`enemy`オブジェクト、`CHARACTERS`テーブル、`choiceLog`/`battleLog`/`charaNumArray`、全ての可変`let`フラグ群
+  - [x] `src/characters.js` — 6キャラ分の`...Action()`関数、`applyCharacterData`/`initialSpValue`、`nakamu5Action`、`actions`マップ、`filterDamage`/`applyDamage`/`kintokiDamage`
+  - [x] `src/dice.js` — `rollDice()`、`rollDiceLogic`、`onPlayerDiceClick`/`onEnemyDiceClick`、`diceRollState`、`promptReroll`
+  - [x] `src/ui.js` — `log()`/`logClear()`、`displayHPandSP()`、`damageEffect()`/`healEffect()`、`toggleCloudEffect()`、`fadeOutDice`/`fadeInDice`、`updateCardDisplay`系、`buttonAble`、`preloadImages`
+  - [x] `src/main.js` — `game()`/`choice()`/`decideName()`/`turnStartEnemy()`/`skipBroKiri()`/`enemyBattle()`/`npcBattle()`/`setChara()`/`resetBattleState()`/`replay()`/`returnTop()`/`randomDecide()`/`randomButtonEnter()`/`decideTurn()`、トップレベルのイベントリスナー登録一式（Viteのエントリポイント）
+- [x] `index.html` の `<script src="script.js">` を `<script type="module" src="/src/main.js">` に変更
+- [x] `index.html` に残る4つのinline `onclick`属性（`random-button`/`turn-decide-button`/`replay`/`top`）を`addEventListener`方式に置き換え、inline onclickを全廃する（ESモジュールはトップレベル関数を自動でグローバル化しないため）
+- [x] `npm install` → `npm run dev` で起動確認
 
 **動作確認**: `npm run dev`で起動し、キャラ選択〜1試合を通しプレイしてコンソールエラーが無いことを確認。既存のPlaywrightスモークテスト（キャラ選択→数ターン操作、出目固定での丸飲み検証など）を`http://localhost:5173`向けに再実施する。
 
